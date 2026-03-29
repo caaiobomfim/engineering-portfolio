@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { MDXRemote } from 'next-mdx-remote/rsc'
-import { getAllProjects, getProjectBySlug } from '@/lib/mdx'
+import { getAllProjects, getProjectBySlug } from '@/lib/projects'
 
 interface ProjectPageProps {
   params: Promise<{ slug: string }>
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
 
   return {
     title: project.title,
-    description: project.description,
+    description: project.summary,
   }
 }
 
@@ -35,18 +36,23 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   return (
     <article className="mx-auto max-w-3xl px-4 py-16">
       <header className="mb-10">
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <span className="text-xs px-2 py-0.5 rounded-full border border-gray-300 text-gray-500">
+            {project.status}
+          </span>
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-mono"
+              className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
             >
               {tag}
             </span>
           ))}
         </div>
+
         <h1 className="text-3xl font-bold text-gray-900">{project.title}</h1>
-        <p className="mt-3 text-lg text-gray-500">{project.description}</p>
+        <p className="mt-3 text-lg text-gray-500">{project.summary}</p>
+
         {project.date && (
           <p className="mt-2 text-xs text-gray-400">
             {new Date(project.date).toLocaleDateString('pt-BR', {
@@ -54,6 +60,31 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               month: 'long',
             })}
           </p>
+        )}
+
+        {(project.github || project.demo) && (
+          <div className="mt-4 flex gap-4">
+            {project.github && (
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors underline underline-offset-2"
+              >
+                GitHub →
+              </a>
+            )}
+            {project.demo && (
+              <a
+                href={project.demo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors underline underline-offset-2"
+              >
+                Demo →
+              </a>
+            )}
+          </div>
         )}
       </header>
 
@@ -70,6 +101,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
       <div className="prose prose-gray max-w-none">
         <MDXRemote source={project.content} />
+      </div>
+
+      <div className="mt-16 pt-8 border-t border-gray-200">
+        <Link href="/projects" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+          ← Voltar para projetos
+        </Link>
       </div>
     </article>
   )

@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import type { Project } from '@/lib/mdx'
+import type { Project } from '@/lib/projects'
 
 interface ProjectCardProps {
   project: Project
 }
 
-export default function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project }: ProjectCardProps) {
   return (
     <Link href={`/projects/${project.slug}`} className="group block">
       <article className="border border-gray-200 rounded-lg overflow-hidden hover:border-gray-400 transition-colors bg-white">
@@ -23,14 +23,14 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           <h2 className="text-base font-semibold text-gray-900 group-hover:text-gray-600 transition-colors">
             {project.title}
           </h2>
-          <p className="mt-1 text-sm text-gray-500 line-clamp-2">{project.description}</p>
+          <p className="mt-1 text-sm text-gray-500 line-clamp-2">{project.summary}</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
+            {project.stack.map((tech) => (
               <span
-                key={tag}
+                key={tech}
                 className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-mono"
               >
-                {tag}
+                {tech}
               </span>
             ))}
           </div>
