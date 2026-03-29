@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Project } from '@/lib/projects'
+import { getTagColor } from '@/lib/tag-colors'
 
 interface ProjectCardProps {
   project: Project
@@ -28,7 +29,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             {project.stack.map((tech) => (
               <span
                 key={tech}
-                className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-mono"
+                className={`text-xs px-2 py-0.5 rounded-full font-mono ${getTagColor(tech)}`}
               >
                 {tech}
               </span>

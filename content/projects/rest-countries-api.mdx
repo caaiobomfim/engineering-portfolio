@@ -1,0 +1,111 @@
+---
+title: "Journey Lab — REST Countries API"
+slug: "rest-countries-api"
+summary: "API intermediária em Java/Spring Boot para consumo da REST Countries API pública, com foco em testes de integração, resiliência e evolução incremental por releases."
+stack:
+  - Java
+  - Spring Boot
+  - OpenFeign
+  - WireMock
+  - Testcontainers
+  - Docker
+tags:
+  - backend
+  - testes
+  - arquitetura
+status: "Em andamento"
+featured: true
+order: 2
+cover: "/images/projects/rest-countries-api/cover.svg"
+github: "https://github.com/caaiobomfim/journey-lab-rest-countries"
+demo: ""
+date: "2024-12-01"
+---
+
+## Contexto
+
+O Journey Lab é uma iniciativa pessoal de evolução técnica onde cada projeto simula cenários reais de engenharia de software. O **REST Countries API** foi construído para ir além do CRUD básico: o objetivo era aplicar boas práticas de arquitetura, testes e resiliência em um contexto de integração com serviço externo.
+
+O projeto foi desenvolvido de forma incremental, seguindo um modelo de evolução por releases — semelhante ao fluxo de times de engenharia maduros — com cada versão adicionando uma camada de qualidade ao sistema.
+
+## Problema
+
+Consumir APIs externas em sistemas reais apresenta desafios que projetos de estudo convencionais não simulam:
+
+- **Indisponibilidade:** a API externa pode estar fora do ar ou com latência alta
+- **Testes frágeis:** testar contra a API real torna os testes não determinísticos e lentos
+- **Acoplamento forte:** sem abstração, o sistema inteiro é afetado por mudanças no contrato externo
+- **Observabilidade ausente:** sem logs e métricas, falhas de integração são invisíveis em produção
+
+A ausência de estratégias para lidar com esses problemas é o que diferencia um projeto de estudo de um sistema pronto para produção.
+
+## Solução
+
+Construção de uma API intermediária que consome a [REST Countries API](https://restcountries.com) pública, aplicando camadas de abstração e qualidade sobre a integração:
+
+- Camada de cliente isolada via OpenFeign, com mapeamento de erros externos para exceções internas
+- Testes de integração com WireMock para simular a API externa sem depender dela
+- Ambiente de testes isolado e reprodutível com Testcontainers
+- Evolução por releases, cada uma com foco em um aspecto de qualidade específico
+
+## Arquitetura
+
+```
+Cliente HTTP
+     │
+     ▼
+Controller (REST)
+     │  validação de entrada, mapeamento de rotas
+     ▼
+Service
+     │  regras de negócio, orquestração
+     ▼
+Feign Client
+     │  comunicação tipada com a API externa
+     ▼
+REST Countries API (externa)
+```
+
+O tratamento de exceções é centralizado: erros do Feign (timeout, 4xx, 5xx) são capturados em um `ErrorDecoder` e convertidos para exceções de domínio antes de chegar ao Service. Isso isola o restante da aplicação de detalhes do protocolo HTTP externo.
+
+![Arquitetura do Journey Lab REST Countries](/images/projects/rest-countries-api/cover.svg)
+
+## Stack Utilizada
+
+- **Java 17 + Spring Boot** — base da aplicação; Spring Boot para configuração e exposição dos endpoints
+- **Spring Cloud OpenFeign** — cliente HTTP declarativo para integração com a REST Countries API
+- **JUnit 5** — testes unitários das camadas de Service e Controller
+- **WireMock** — simulação da API externa nos testes de integração; permite testar cenários de erro sem depender do serviço real
+- **Testcontainers** — ambiente isolado e reprodutível para testes de integração; elimina o problema de "funciona na minha máquina"
+- **Docker + Compose** — containerização da aplicação e dependências
+
+## Decisões Técnicas
+
+**WireMock em vez de mocks in-memory:** a escolha foi deliberada. Mocks in-memory testam o comportamento do código, mas não testam a serialização/deserialização HTTP, headers, status codes e outros detalhes de protocolo. WireMock simula um servidor HTTP real, tornando os testes de integração muito mais próximos do comportamento em produção.
+
+**Testcontainers para isolamento:** garantir que os testes rodam da mesma forma em qualquer ambiente (local, CI, máquina de outro dev) é crítico para um projeto que cresce. Testcontainers provisiona a infraestrutura necessária em containers Docker a cada execução de teste.
+
+**Evolução por releases:** em vez de tentar construir o sistema "completo" de uma vez, cada release adiciona uma camada de qualidade. Isso simula como times reais trabalham e permite aprender de forma mais estruturada.
+
+## Desafios
+
+**Configuração do WireMock com cenários dinâmicos:** a documentação do WireMock é extensa, mas configurar cenários que simulam timeout real (não apenas delay), conexão encerrada abruptamente e respostas malformadas exigiu experimentação.
+
+**Integração Testcontainers + WireMock:** fazer o WireMock rodar dentro de um container gerenciado pelo Testcontainers, com a URL dinâmica sendo injetada no Feign Client em runtime, exigiu entender o ciclo de vida dos containers durante os testes.
+
+**Tratamento de exceções do Feign:** o Feign lança exceções genéricas por padrão. Implementar um `ErrorDecoder` customizado para converter cada tipo de erro externo em uma exceção de domínio específica foi mais trabalhoso do que o esperado, especialmente para casos como `RetryableException` (timeout) vs `FeignException` (erros HTTP).
+
+## Aprendizados
+
+**Testes de integração são parte do design, não validação posterior.** Escrever os testes de integração antes ou junto com o código forçou decisões melhores de arquitetura — especialmente na separação do Feign Client como uma fronteira isolável.
+
+**WireMock muda a forma de pensar sobre contratos externos.** Ao definir os stubs do WireMock, você é forçado a documentar explicitamente o que a API externa pode retornar (incluindo cenários de erro), o que melhora o entendimento do sistema como um todo.
+
+**Observabilidade deve ser planejada desde o início.** Adicionar logs estruturados retroativamente é muito mais trabalhoso do que incluí-los na implementação inicial. Esse foi o principal aprendizado que vai guiar as próximas releases do projeto.
+
+## Próximos Passos
+
+- Implementar resiliência com **Resilience4j** (Retry, Circuit Breaker, Timeout configurável por rota)
+- Adicionar **observabilidade completa**: logs estruturados (JSON), métricas via Micrometer, tracing com OpenTelemetry
+- Criar dashboard de monitoramento (Prometheus + Grafana)
+- Deploy em cloud (AWS ECS ou similar) com pipeline de CI/CD
