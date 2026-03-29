@@ -1,0 +1,52 @@
+---
+title: "API Gateway Service"
+description: "Gateway centralizado para roteamento, autenticação e rate limiting de microsserviços internos."
+tags: ["Go", "gRPC", "Redis", "Docker"]
+cover: "/images/placeholder-api-gateway.svg"
+date: "2024-11-01"
+---
+
+## Visão Geral
+
+Um gateway de API construído em Go para centralizar o acesso a microsserviços internos. O serviço atua como ponto único de entrada, responsável por autenticação, roteamento e controle de tráfego.
+
+## Problema
+
+A plataforma cresceu de forma orgânica com dezenas de microsserviços expostos diretamente. Isso gerava:
+
+- Duplicação de lógica de autenticação em cada serviço
+- Dificuldade para aplicar rate limiting de forma consistente
+- Ausência de observabilidade centralizada das requisições
+
+## Stack
+
+| Camada | Tecnologia |
+|--------|-----------|
+| Linguagem | Go 1.22 |
+| Comunicação interna | gRPC |
+| Cache / Rate limit | Redis |
+| Containerização | Docker + Compose |
+| Proxy reverso | Envoy |
+
+## Demonstração
+
+A imagem abaixo ilustra o fluxo de uma requisição pelo gateway:
+
+![Diagrama do API Gateway](/images/placeholder-api-gateway.svg)
+
+O cliente envia a requisição ao gateway → o gateway valida o token JWT via Redis → roteia para o microsserviço correto via gRPC → retorna a resposta com headers de rastreamento.
+
+## Resultados
+
+- Redução de **40% no tempo médio** de implementação de novos endpoints (autenticação já estava pronta)
+- Rate limiting centralizado bloqueou **~12k requisições abusivas** no primeiro mês
+- Latência adicionada pelo gateway: **< 2ms no p99**
+- Cobertura de testes: **87%**
+
+## Aprendizados
+
+**gRPC vs REST internamente:** Migrar a comunicação interna para gRPC foi a decisão com maior impacto. A geração automática de código e a tipagem forte reduziram bugs de contrato entre serviços.
+
+**Redis para rate limiting:** Usar Redis com o algoritmo de sliding window foi direto de implementar e escalou sem problemas até o volume atual.
+
+**Observabilidade desde o início:** Adicionar tracing com trace IDs desde o primeiro deploy economizou horas de debugging posteriores. Essa foi a lição mais valiosa do projeto.
