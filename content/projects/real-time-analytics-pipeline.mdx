@@ -1,50 +1,95 @@
 ---
 title: "Pipeline de Analytics em Tempo Real"
-description: "Pipeline de ingestão e processamento de eventos de comportamento do usuário com latência sub-segundo."
-tags: ["Python", "Kafka", "ClickHouse", "Kubernetes"]
-cover: "/images/placeholder-analytics.svg"
+slug: "real-time-analytics-pipeline"
+summary: "Pipeline de ingestão e processamento de eventos de comportamento de usuários com latência sub-segundo."
+stack:
+  - Python
+  - Kafka
+  - ClickHouse
+  - Kubernetes
+tags:
+  - backend
+  - dados
+  - infraestrutura
+status: "Finalizado"
+featured: true
+order: 2
+cover: "/images/projects/real-time-analytics-pipeline/cover.svg"
+github: ""
+demo: ""
 date: "2024-08-15"
 ---
 
-## Visão Geral
+## Contexto
 
-Pipeline de dados construído para ingerir, processar e disponibilizar eventos de comportamento de usuários em tempo real. O sistema processa cerca de 50 mil eventos por segundo em produção.
+A equipe de produto dependia de dados de comportamento de usuários para tomar decisões sobre features e experimentos A/B. O pipeline existente era baseado em batch jobs que rodavam a cada 6 horas, o que tornava os dados de dashboard sempre defasados. O volume de eventos em produção era de aproximadamente 50 mil por segundo no pico.
 
 ## Problema
 
-O sistema legado de analytics usava um pipeline batch com execução a cada 6 horas. Isso gerava:
+O pipeline batch gerava três problemas críticos para o negócio:
 
-- Dados de dashboard desatualizados para a equipe de produto
-- Incapacidade de reagir a anomalias em tempo real (ex: spike de erros)
-- ETL frágil que falhava silenciosamente sem alertas
+- **Latência de dados:** métricas de experimentos A/B chegavam com 6h de atraso, impedindo reações rápidas a comportamentos inesperados
+- **Falhas silenciosas:** o ETL legado falhava sem alertas, e os dashboards mostravam dados desatualizados sem indicação de erro para os usuários
+- **Incapacidade de reação em tempo real:** anomalias como spike de erros ou queda de conversão só eram detectadas horas depois de ocorrer
 
-## Stack
+## Solução
 
-| Camada | Tecnologia |
-|--------|-----------|
-| Ingestão | Apache Kafka |
-| Processamento | Python + Faust (stream processing) |
-| Armazenamento analítico | ClickHouse |
-| Orquestração | Kubernetes (GKE) |
-| Monitoramento | Grafana + Prometheus |
+Substituição do pipeline batch por uma arquitetura de stream processing com Kafka como buffer de eventos e ClickHouse como banco analítico OLAP. O objetivo era reduzir a latência de ponta a ponta de 6 horas para menos de 1 segundo, mantendo a mesma confiabilidade de entrega.
 
-## Demonstração
+## Arquitetura
 
-![Arquitetura do Pipeline](/images/placeholder-analytics.svg)
+```
+Serviços de produto (Producers)
+    │  eventos JSON via HTTP/Kafka SDK
+    ▼
+Apache Kafka (8 partições)
+    │  buffer durável, retenção 7 dias
+    ▼
+Faust Workers (Python, 4 réplicas)
+    │  enriquecimento, normalização, deduplicação
+    ▼
+ClickHouse
+    │  armazenamento OLAP, particionamento por data
+    ▼
+Grafana / API interna
+    └  dashboards e consultas ad-hoc
+```
 
-Fluxo: **Producers** (serviços de produto) → **Kafka** (buffer e durabilidade) → **Faust workers** (enriquecimento e normalização) → **ClickHouse** (armazenamento OLAP) → **Dashboards** (Grafana / API interna).
+![Arquitetura do Pipeline](/images/projects/real-time-analytics-pipeline/cover.svg)
 
-## Resultados
+O pipeline foi projetado para tolerar falhas: se um worker cai, ele reinicia do último offset commitado no Kafka sem perda de eventos.
 
-- Latência de ponta a ponta (evento → dashboard): **de 6h para < 1s**
-- Throughput sustentado: **50k eventos/segundo** com 8 partições Kafka
-- Custo de infraestrutura de analytics: redução de **35%** vs solução anterior (Redshift)
-- Uptime nos últimos 6 meses: **99.94%**
+## Stack Utilizada
+
+- **Apache Kafka** — buffer de eventos com garantia de entrega e retenção durável
+- **Python + Faust** — stream processing; Faust foi escolhido por ser nativo Python e ter boa integração com Kafka
+- **ClickHouse** — banco OLAP; queries analíticas que levavam 8s no PostgreSQL rodam em 200ms
+- **Kubernetes (GKE)** — orquestração dos workers com autoscaling horizontal
+- **Grafana + Prometheus** — monitoramento de saúde do pipeline e métricas de negócio
+
+## Decisões Técnicas
+
+**Kafka vs RabbitMQ:** Kafka foi escolhido pela capacidade de replay de mensagens (consumidores podem reprocessar eventos históricos) e pela separação entre produção e consumo — múltiplos consumers independentes podem ler o mesmo tópico sem interferência.
+
+**ClickHouse vs PostgreSQL para analytics:** PostgreSQL não é adequado para queries analíticas de alta cardinalidade em datasets grandes. ClickHouse usa armazenamento colunar e compressão agressiva, o que reduziu o tamanho do storage em ~70% e acelerou queries em 40x.
+
+**Deduplicação no worker, não no banco:** Eventos duplicados são filtrados no Faust worker usando uma janela de tempo + hash do evento, antes de chegar ao ClickHouse. Deduplicar no banco seria mais caro e mais lento.
+
+## Desafios
+
+**Consumer lag como indicador de saúde:** A métrica mais importante do pipeline não é throughput — é o consumer lag do Kafka. Descobrimos isso da pior forma: um worker com bug estava processando eventos mas não commitando offsets, causando reprocessamento em loop. O lag explodia enquanto o throughput parecia normal.
+
+**Particionamento do ClickHouse:** A escolha errada de chave de particionamento gerou hotspots em produção. Particionar por `event_type` concentrou escrita em poucas partições durante picos. A correção para particionamento por data resolveu o problema mas exigiu migração dos dados existentes.
 
 ## Aprendizados
 
-**ClickHouse como banco analítico:** A escolha do ClickHouse foi decisiva. Queries que levavam 8s no PostgreSQL rodam em 200ms. A curva de aprendizado é alta mas o retorno é imediato para workloads analíticos.
+**Observabilidade de pipeline é diferente de observabilidade de API.** Métricas de latência e error rate não são suficientes — é preciso monitorar lag de consumidor, tamanho de batch, taxa de deduplicação e tamanho de partições para ter visibilidade real do que está acontecendo.
 
-**Kafka para tolerância a falhas:** Antes de Kafka, perder um worker significava perder eventos. Com Kafka, consumidores reiniciam do offset correto. Essa garantia de entrega mudou completamente a confiabilidade do sistema.
+**Stream processing tem um modelo mental diferente de request/response.** A curva de aprendizado da equipe foi maior do que o esperado. Documentar o modelo de garantias (at-least-once, exactly-once) e os contratos de cada tópico Kafka reduziu significativamente os bugs de integração.
 
-**Monitoramento de lag:** A métrica mais importante do pipeline não é throughput — é o consumer lag do Kafka. Essa foi a lição mais cara: descobrimos um gargalo 3 dias depois que já havia causado perda de dados históricos.
+## Próximos Passos
+
+- Implementar exactly-once semantics com transações Kafka + ClickHouse
+- Adicionar suporte a backfill automático quando um consumer fica offline por longos períodos
+- Criar camada de API para consultas analíticas parametrizadas (reduzir dependência direta do Grafana)
+- Explorar migração de Faust para Apache Flink para maior controle sobre janelas temporais

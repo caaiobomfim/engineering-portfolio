@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { getAllProjects } from '@/lib/mdx'
-import ProjectCard from '@/components/ProjectCard'
+import { getAllProjects } from '@/lib/projects'
+import { ProjectCard } from '@/components/project/project-card'
 
 export const metadata: Metadata = {
   title: 'Projetos',
