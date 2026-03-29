@@ -61,6 +61,13 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v0.1.2] - 2026-03-29
+
+### 📚 Docs
+- reescrito `README.md` com stack, estrutura de pastas, instruções de execução local, guia para adicionar novo projeto e instruções de deploy
+
+---
+
 ## [v0.2.0] - YYYY-MM-DD
 
 ### ✨ Added
