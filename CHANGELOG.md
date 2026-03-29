@@ -68,6 +68,21 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v0.1.3] - 2026-03-29
+
+### ✨ Added
+- adicionado projeto real "Journey Lab — Sistema de Título de Capitalização" com 9 seções completas
+- criada pasta `public/images/projects/capitalization-system/` com cover SVG (diagrama da arquitetura event-driven)
+
+### 🔄 Changed
+- substituído projeto fictício "API Gateway Service" pelo projeto real de capitalização
+- projeto de capitalização definido como `featured: true` e `order: 1`
+
+### 🧹 Refactor
+- removida pasta `public/images/projects/api-gateway-service/`
+
+---
+
 ## [v0.2.0] - YYYY-MM-DD
 
 ### ✨ Added
