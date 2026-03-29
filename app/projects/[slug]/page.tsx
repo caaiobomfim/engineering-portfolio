@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { getAllProjects, getProjectBySlug } from '@/lib/projects'
+import { getTagColor } from '@/lib/tag-colors'
 
 interface ProjectPageProps {
   params: Promise<{ slug: string }>
@@ -43,7 +44,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
+              className={`text-xs px-2 py-0.5 rounded-full ${getTagColor(tag)}`}
             >
               {tag}
             </span>

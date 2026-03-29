@@ -43,6 +43,24 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v0.1.1] - 2026-03-29
+
+### ✨ Added
+- adicionado projeto real "Journey Lab — REST Countries API" com GitHub link
+- criado utilitário `lib/tag-colors.ts` para cores determinísticas por tag
+- adicionada pasta `public/images/projects/rest-countries-api/` com cover SVG
+
+### 🔄 Changed
+- substituído projeto fictício "Pipeline de Analytics em Tempo Real" pelo projeto real Journey Lab
+- corrigido nome do autor: "Caio Andrade" → "Caio Bomfim Godoy" em header, metadata e home
+- tags de stack agora exibem cores distintas por tecnologia (ProjectCard e página de projeto)
+- adicionado `./lib/**/*.{ts,tsx}` ao `content` do Tailwind para incluir classes de cor
+
+### 🧹 Refactor
+- removida pasta `public/images/projects/real-time-analytics-pipeline/`
+
+---
+
 ## [v0.2.0] - YYYY-MM-DD
 
 ### ✨ Added

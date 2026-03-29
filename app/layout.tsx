@@ -4,8 +4,8 @@ import { Header } from '@/components/layout/header'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Caio Andrade',
-    default: 'Caio Andrade — Engenheiro de Software',
+    template: '%s | Caio Bomfim Godoy',
+    default: 'Caio Bomfim Godoy — Engenheiro de Software',
   },
   description: 'Portfólio de engenharia de software com projetos técnicos, arquitetura e aprendizados.',
 }
@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main className="flex-1">{children}</main>
         <footer className="border-t border-gray-200 py-6 text-center text-xs text-gray-400">
-          © {new Date().getFullYear()} Caio Andrade
+          © {new Date().getFullYear()} Caio Bomfim Godoy
         </footer>
       </body>
     </html>
