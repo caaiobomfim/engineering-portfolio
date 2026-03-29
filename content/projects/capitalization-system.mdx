@@ -1,0 +1,182 @@
+---
+title: "Journey Lab — Sistema de Título de Capitalização"
+slug: "capitalization-system"
+summary: "Sistema financeiro de capitalização com sorteios, distribuição de prêmios e arquitetura orientada a eventos — modelado com DDD, Clean Architecture e mensageria assíncrona via SQS."
+stack:
+  - Java
+  - Spring Boot
+  - DDD
+  - Clean Architecture
+  - AWS SQS
+  - Docker
+  - JUnit 5
+tags:
+  - backend
+  - arquitetura
+  - sistemas financeiros
+status: "Em andamento"
+featured: true
+order: 1
+cover: "/images/projects/capitalization-system/cover.svg"
+github: ""
+demo: ""
+date: "2025-01-01"
+---
+
+## Contexto
+
+O **Journey Lab — Sistema de Título de Capitalização** é um projeto prático desenvolvido para simular um sistema financeiro real, inspirado em produtos de capitalização utilizados por instituições financeiras.
+
+A proposta foi modelar um sistema onde usuários adquirem cartelas (títulos), participam de sorteios periódicos e podem ser contemplados com o prêmio integral ou com divisão entre múltiplos ganhadores.
+
+Seguindo o conceito do Journey Lab, o sistema é evoluído de forma incremental (**release-driven**), simulando um ambiente real de produto — com cada entrega adicionando uma camada de complexidade técnica intencional.
+
+---
+
+## Problema
+
+Sistemas de capitalização envolvem desafios relevantes de engenharia:
+
+- Processamento de sorteios com múltiplos participantes simultâneos
+- Garantia de consistência na distribuição de prêmios
+- Escalabilidade para grande volume de usuários
+- Controle de concorrência em eventos paralelos
+- Rastreabilidade de cada etapa (quem ganhou, quando, quanto)
+- Processos síncronos que não escalam bem sob carga
+- Necessidade de reprocessamento em caso de falha
+
+Além da complexidade técnica, o domínio exige regras de negócio bem definidas — elegibilidade, apuração de ganhadores, divisão de prêmio — que precisam ser modeladas com clareza e testabilidade.
+
+---
+
+## Solução
+
+Foi projetado um sistema baseado em eventos que:
+
+- Permite a compra de títulos/cartelas
+- Registra participantes em sorteios
+- Executa sorteios de forma controlada
+- Calcula e distribui prêmios automaticamente
+- Emite eventos de negócio para cada etapa do fluxo
+
+A solução utiliza separação clara de responsabilidades, arquitetura orientada a domínio, comunicação assíncrona para escalabilidade e modelagem focada nas regras de negócio.
+
+O foco principal é garantir: **consistência + escalabilidade + rastreabilidade**.
+
+---
+
+## Arquitetura
+
+Arquitetura baseada em **DDD + Event-Driven + Clean Architecture**:
+
+```
+Controller → Use Case → Domain → Repository
+                      ↓
+                 Event Publisher → Queue (SQS)
+                                      ↓
+                                  Consumers
+```
+
+### Camadas principais
+
+**API (Entrada)**
+- Compra de título
+- Consulta de títulos e sorteios
+
+**Camada de Domínio**
+- Entidades: `Título`, `Sorteio`, `Participante`
+- Regras de negócio: elegibilidade, apuração de ganhadores, distribuição de prêmio
+
+**Use Cases**
+- Criar título
+- Participar de sorteio
+- Executar sorteio
+- Distribuir prêmio
+
+**Mensageria (SQS)**
+- `TitlePurchasedEvent`
+- `DrawExecutedEvent`
+- `PrizeDistributedEvent`
+
+**Consumers**
+- Processamento assíncrono de eventos
+- Base para integrações futuras
+
+---
+
+## Stack Utilizada
+
+| Camada | Tecnologia |
+|---|---|
+| Backend | Java 17+, Spring Boot |
+| Arquitetura | DDD, Clean Architecture |
+| Mensageria | AWS SQS |
+| Persistência | DynamoDB / MongoDB (dependendo da evolução) |
+| Testes | JUnit 5, testes unitários de domínio, testes de integração |
+| Infra | Docker, Docker Compose |
+
+---
+
+## Decisões Técnicas
+
+### DDD (Domain-Driven Design)
+
+Modelagem rica do domínio com clareza nas regras de negócio e separação explícita entre domínio e infraestrutura. O objetivo foi evitar modelos anêmicos e garantir que a lógica de negócio vivesse nas entidades, não nos serviços.
+
+### Arquitetura Event-Driven
+
+Desacoplamento entre componentes via eventos de domínio, melhor escalabilidade e abertura natural para evolução em microsserviços independentes.
+
+### Mensageria com SQS
+
+Processamento assíncrono com resiliência a falhas e suporte a reprocessamento. Permite que consumidores processem eventos de forma independente, com retry automático e dead-letter queue.
+
+### Consistência Eventual
+
+Escolha deliberada para melhor performance em cenários distribuídos, aceitando latência controlada em troca de escalabilidade e disponibilidade.
+
+### Evolução Incremental (Release-Driven)
+
+Entregas pequenas e contínuas com foco em validação e aprendizado a cada versão. Cada release adiciona uma camada de complexidade com intenção arquitetural clara.
+
+---
+
+## Desafios
+
+- Modelagem correta do domínio para evitar anemias
+- Garantir consistência em processamento assíncrono
+- Evitar duplicidade de eventos (idempotência)
+- Controle de concorrência em sorteios simultâneos
+- Definir estratégia clara de distribuição de prêmio
+- Balancear complexidade técnica com simplicidade de implementação
+
+---
+
+## Aprendizados
+
+**Técnicos**
+- Como aplicar DDD na prática em sistemas financeiros
+- Implementação de arquitetura orientada a eventos com SQS
+- Estratégias de idempotência em mensageria
+- Modelagem de regras de negócio complexas sem anemias
+
+**Engenharia**
+- Sistemas distribuídos exigem trade-offs conscientes
+- Consistência nem sempre é imediata — e está tudo bem
+- Eventos são fundamentais para rastreabilidade e auditoria
+- Arquitetura deve acompanhar o domínio, não o contrário
+
+**Mentalidade**
+- Pensar em sistemas financeiros reais exige robustez antes de funcionalidade
+- Modelar antes de codar reduz retrabalho
+- Evoluir com intenção arquitetural é diferente de apenas adicionar features
+
+---
+
+## Próximos Passos
+
+- Implementar orquestração automática de sorteios via scheduler
+- Criar dashboard de métricas de negócio (valor distribuído, nº de ganhadores)
+- Integrar com serviços externos (pagamento, notificação)
+- Evoluir para microsserviços independentes
+- Deploy em AWS (ECS + SQS + DynamoDB)
