@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="420" viewBox="0 0 800 420">
+  <rect width="800" height="420" fill="#f3f4f6"/>
+
+  <!-- Controller -->
+  <rect x="30" y="180" width="110" height="60" rx="6" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="85" y="205" font-family="monospace" font-size="11" fill="#1d4ed8" text-anchor="middle">Controller</text>
+  <text x="85" y="221" font-family="monospace" font-size="10" fill="#3b82f6" text-anchor="middle">API Layer</text>
+
+  <!-- Use Case -->
+  <rect x="190" y="180" width="110" height="60" rx="6" fill="#ede9fe" stroke="#c4b5fd" stroke-width="1.5"/>
+  <text x="245" y="205" font-family="monospace" font-size="11" fill="#6d28d9" text-anchor="middle">Use Case</text>
+  <text x="245" y="221" font-family="monospace" font-size="10" fill="#7c3aed" text-anchor="middle">Application</text>
+
+  <!-- Domain -->
+  <rect x="350" y="160" width="110" height="100" rx="6" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1.5"/>
+  <text x="405" y="195" font-family="monospace" font-size="11" fill="#065f46" text-anchor="middle">Domain</text>
+  <text x="405" y="211" font-family="monospace" font-size="9" fill="#047857" text-anchor="middle">Título · Sorteio</text>
+  <text x="405" y="225" font-family="monospace" font-size="9" fill="#047857" text-anchor="middle">Participante</text>
+  <text x="405" y="241" font-family="monospace" font-size="9" fill="#047857" text-anchor="middle">Regras de Negócio</text>
+
+  <!-- Repository -->
+  <rect x="350" y="290" width="110" height="50" rx="6" fill="#e5e7eb" stroke="#d1d5db" stroke-width="1.5"/>
+  <text x="405" y="318" font-family="monospace" font-size="11" fill="#374151" text-anchor="middle">Repository</text>
+
+  <!-- Event Publisher -->
+  <rect x="510" y="180" width="110" height="60" rx="6" fill="#fef3c7" stroke="#fcd34d" stroke-width="1.5"/>
+  <text x="565" y="203" font-family="monospace" font-size="10" fill="#92400e" text-anchor="middle">Event</text>
+  <text x="565" y="218" font-family="monospace" font-size="10" fill="#92400e" text-anchor="middle">Publisher</text>
+  <text x="565" y="233" font-family="monospace" font-size="9" fill="#b45309" text-anchor="middle">SQS Queue</text>
+
+  <!-- Consumers -->
+  <rect x="670" y="160" width="110" height="100" rx="6" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
+  <text x="725" y="195" font-family="monospace" font-size="11" fill="#9d174d" text-anchor="middle">Consumers</text>
+  <text x="725" y="213" font-family="monospace" font-size="9" fill="#be185d" text-anchor="middle">TitlePurchased</text>
+  <text x="725" y="227" font-family="monospace" font-size="9" fill="#be185d" text-anchor="middle">DrawExecuted</text>
+  <text x="725" y="241" font-family="monospace" font-size="9" fill="#be185d" text-anchor="middle">PrizeDistributed</text>
+
+  <!-- Arrows: Controller → Use Case -->
+  <line x1="140" y1="210" x2="188" y2="210" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Use Case → Domain -->
+  <line x1="300" y1="210" x2="348" y2="210" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Domain → Repository (down) -->
+  <line x1="405" y1="260" x2="405" y2="288" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Domain → Event Publisher -->
+  <line x1="460" y1="210" x2="508" y2="210" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Event Publisher → Consumers -->
+  <line x1="620" y1="210" x2="668" y2="210" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+
+  <!-- Footer label -->
+  <text x="400" y="395" font-family="monospace" font-size="11" fill="#9ca3af" text-anchor="middle">Sistema de Capitalização — DDD + Event-Driven + Clean Architecture</text>
+</svg>
