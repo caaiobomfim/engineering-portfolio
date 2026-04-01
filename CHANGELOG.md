@@ -68,12 +68,25 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
-## [v0.2.0] - YYYY-MM-DD
+## [v0.2.0] - 2026-04-01
 
 ### ✨ Added
+- sistema de filtro por tags na página `/projects` com suporte a múltiplas tags simultâneas (lógica OR)
+- componente `TagBadge` — badge reutilizável com modo display (`<span>`) e modo interativo (`<button aria-pressed>`)
+- componente `TagFilter` — barra de chips clicáveis com botão "Limpar filtros"
+- componente `ProjectsSection` — wrapper client-side com estado de filtro e sincronização via URL query params (`?tags=backend,testes`)
+- utilitário `lib/tags.ts` com `extractAllTags` e `filterProjectsByTags`
+- utilitário `lib/stack-icons.ts` com mapeamento de tech names → slugs do Simple Icons
+- componente `StackIcon` — renderiza ícones SVG de marca para tecnologias conhecidas, com fallback em texto monospace para as demais
+- suporte a query params para persistência de filtro no refresh e URLs compartilháveis
 
 ### 🔄 Changed
+- substituídos os badges de texto da stack nos cards por ícones SVG via `simple-icons` (Server Component — zero JS no cliente)
+- `app/projects/page.tsx` refatorado para ler `searchParams` no servidor e repassar `initialTags` ao componente client
+- `project-card.tsx` atualizado para usar `StackIcon` no lugar das `<span>` com `getTagColor`
 
-### 🐛 Fixed
+### 📦 Dependencies
+- adicionado `simple-icons@^16.14.0`
+- removido `react-icons` (substituído integralmente por `simple-icons`)
 
 ---
