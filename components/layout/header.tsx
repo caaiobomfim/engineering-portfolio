@@ -17,6 +17,9 @@ export function Header() {
           <Link href="/projects" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
             Projetos
           </Link>
+          <Link href="/certifications" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+            Certificações
+          </Link>
         </nav>
       </div>
     </header>

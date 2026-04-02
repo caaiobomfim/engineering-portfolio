@@ -106,6 +106,24 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v0.4.0] - 2026-04-01
+
+### ✨ Added
+- nova página `/certifications` com grade responsiva de cards de certificações
+- componente `CertificationCard` — exibe ícone do emissor via `simple-icons`, título, data, badge de status e link para credencial
+- tipo `Certification` e `CertificationStatus` (`'Concluída' | 'Em andamento' | 'Expirada'`) em `lib/certifications.ts`
+- função `getCertifications()` que retorna certificações ordenadas por status e data
+- 5 certificações mockadas de exemplo: AWS Solutions Architect, Google Cloud Data Engineer, HashiCorp Terraform Associate, Azure Fundamentals e CNCF Kubernetes
+- link "Certificações" adicionado à navegação do `Header`
+
+### 🎨 UI
+- badge de status com cores semânticas: verde (Concluída), azul (Em andamento), cinza (Expirada)
+- ícone do emissor renderizado via `simple-icons` com fallback de inicial para emissores sem ícone cadastrado
+- link "Ver credencial" com ícone de abertura externa, acessível via `aria-label`
+- grid `sm:grid-cols-2` responsivo, consistente com o restante do portfólio
+
+---
+
 ## [v0.3.0] - 2026-04-01
 
 ### ✨ Added
