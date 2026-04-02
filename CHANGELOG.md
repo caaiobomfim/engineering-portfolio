@@ -105,3 +105,22 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 - removido `react-icons` (substituído integralmente por `simple-icons`)
 
 ---
+
+## [v0.3.0] - 2026-04-01
+
+### ✨ Added
+- sistema de busca local em tempo real na página `/projects` com filtro por `title`, `summary`, `slug`, `tags` e `stack`
+- componente `SearchInput` — campo de busca com ícone de lupa, placeholder descritivo, foco visível e botão de limpar
+- utilitário `lib/search.ts` com `normalizeText` (remoção de acentos via NFD), `searchProjects` e `filterProjects` (busca + tags combinados)
+- hook `hooks/use-debounce.ts` — debounce de 200ms para manter o input responsivo sem reprocessamentos excessivos
+- estado vazio com ações contextuais: "Limpar busca" e/ou "Limpar filtros de tag" conforme o que estiver ativo
+- suporte a query param `?search=` na URL — compatível com `?tags=` (ex: `/projects?search=spring&tags=backend`)
+- persistência do termo de busca no refresh via `searchParams` lido no servidor
+
+### 🔄 Changed
+- `ProjectsSection` expandido para gerenciar estado de busca e tags em um único componente com URL sync unificado
+- lógica de filtro migrada para `filterProjects` em `lib/search.ts` — combina busca textual (primeiro) e filtro de tags (segundo, OR)
+- `app/projects/page.tsx` atualizado para ler e repassar `initialQuery` além de `initialTags`
+- mensagem de contagem dinâmica: "N projetos encontrados" quando há filtro ativo vs. "N projetos publicados"
+
+---
