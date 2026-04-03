@@ -14,7 +14,13 @@ export const STACK_ASSETS: Record<string, string> = {
   java:      '/icons/stacks/java.png',
 
   // Cloud / messaging
-  'aws sqs': '/icons/stacks/aws-sqs.png',
+  'aws sqs':  '/icons/stacks/aws-sqs.png',
+  dynamodb:   '/icons/stacks/dynamodb.png',
+  localstack: '/icons/stacks/localstack.png',
+
+  // Observability
+  micrometer:    '/icons/stacks/micrometer.png',
+  opentelemetry: '/icons/stacks/opentelemetry.png',
 
   // Testing
   testcontainers: '/icons/stacks/testcontainers.png',

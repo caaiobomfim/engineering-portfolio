@@ -1,0 +1,275 @@
+---
+title: "ACME Policy Service"
+slug: "acme-policy-service"
+summary: "Microsserviço de gestão de apólices de seguro com arquitetura hexagonal, máquina de estados, motor de regras de fraude e processamento assíncrono via SQS — construído com Java 17, Spring Boot e DynamoDB."
+stack:
+  - Java
+  - Spring Boot
+  - AWS SQS
+  - DynamoDB
+  - Docker
+  - JUnit 5
+  - Testcontainers
+  - WireMock
+  - LocalStack
+  - Micrometer
+  - Prometheus
+  - OpenTelemetry
+tags:
+  - backend
+  - arquitetura
+  - microsserviços
+  - sistemas financeiros
+status: "Em andamento"
+featured: true
+order: 3
+cover: "/images/projects/acme-policy-service/cover.svg"
+icon: "shieldcheck"
+github: ""
+demo: ""
+date: "2025-01-01"
+---
+
+## Contexto
+
+O **ACME Policy Service** é um microsserviço de seguros desenvolvido como parte do Journey Lab — uma iniciativa de evolução técnica onde cada projeto simula cenários reais de engenharia, evoluído de forma incremental por releases com intenção arquitetural clara.
+
+O serviço gerencia o ciclo de vida completo de **solicitações de apólices de seguro**: desde a criação e validação antifraude, passando pela confirmação de pagamento e autorização de subscrição, até a aprovação ou rejeição final — tudo orquestrado de forma assíncrona via mensageria.
+
+O projeto evoluiu por **8 releases** (v0.1.0 → v0.8.0), cada uma adicionando uma camada de complexidade arquitetural deliberada: persistência, mensageria, regras de domínio, observabilidade, testes de integração e cobertura de 90%+.
+
+---
+
+## Problema
+
+Sistemas de seguros envolvem desafios de engenharia que vão muito além de um CRUD:
+
+- **Ciclo de vida complexo**: uma apólice passa por múltiplos estados (recebida → validada → pendente → aprovada/rejeitada), com transições condicionadas a eventos externos
+- **Eventos assíncronos fora de ordem**: confirmações de pagamento e subscrição chegam de forma independente, em qualquer sequência
+- **Motor de regras de fraude**: cada categoria de produto (AUTO, RESIDENCIAL, VIDA) tem limites de valor que variam por perfil de risco do cliente
+- **Consistência sem coordenação síncrona**: aprovar automaticamente uma apólice apenas quando *ambos* os sinais chegaram, sem bloquear threads
+- **Auditabilidade**: toda transição de estado precisa ser rastreada com timestamp e motivo
+- **Testes de integração confiáveis**: validar o comportamento real de SQS, DynamoDB e da API de fraude sem depender de infraestrutura externa
+
+---
+
+## Solução
+
+Foi construído um microsserviço com **Arquitetura Hexagonal** que:
+
+- Expõe uma API REST para criação, consulta e cancelamento de apólices
+- Aplica regras de fraude de forma síncrona via OpenFeign na criação
+- Persiste o estado e histórico completo no DynamoDB
+- Publica e consome eventos de pagamento e subscrição via SQS
+- Coordena aprovação automática via `InMemoryCorrelationStore` — sem polling, sem bloqueio
+- Retorna erros padronizados no formato **RFC 7807 ProblemDetail**
+
+O foco central foi: **consistência de estado + rastreabilidade completa + testabilidade real**.
+
+---
+
+## Arquitetura
+
+Arquitetura baseada em **Hexagonal (Ports & Adapters) + Event-Driven + State Machine**:
+
+```
+REST Client
+     │
+     ▼
+Controller (app layer)
+     │  validação de entrada, mapeamento de DTOs
+     ▼
+Use Cases (application layer)
+     │  CreatePolicy · GetPolicy · ListByCustomer · CancelPolicy
+     ▼
+Domain (core)
+     │  Policy · PolicyStatus · PolicyStateMachine · FraudRules
+     ├──► Repository Port ──► DynamoDB Adapter
+     ├──► Fraud Port      ──► Feign → External Fraud API
+     └──► Event Publisher ──► SQS → Payment/Subscription Consumers
+                                          │
+                                          └──► CorrelationStore → auto-aprova
+```
+
+![Arquitetura do ACME Policy Service](/images/projects/acme-policy-service/cover.svg)
+
+### Camadas
+
+**app** — Camada de apresentação
+- `PolicyController`: endpoints REST com validação via Bean Validation
+- DTOs com anotações `@Positive`, `@Digits` para campos monetários
+- `GlobalProblemHandler`: mapeia exceções de domínio para RFC 7807 com campos customizados (`policyId`, `currentStatus`, `timestamp`)
+- MapStruct para conversão entre DTOs e modelos de domínio
+
+**application** — Casos de uso
+- `CreatePolicyService`: persiste → publica evento → chama fraude → aplica regras → atualiza estado
+- `CancelPolicyService`: cancela com idempotência (já cancelada → sem erro)
+- `PolicyStateMachine`: orquestra transições de estado e publicação de eventos
+
+**domain** — Núcleo do negócio
+- `Policy` (record imutável): agrega estado, histórico, coberturas e assistências
+- `PolicyStatus` (enum com dispatch): cada status sabe como transicionar (`onFraud`, `onPaymentConfirmed`, `onSubscriptionAuthorized`, `onCancel`)
+- `FraudRules`: função pura — recebe classificação, categoria e valor → retorna aprovado/reprovado
+- Ports `in`: interfaces de casos de uso | Ports `out`: `PolicyRepository`, `FraudGateway`, `EventPublisher`
+
+**infra** — Adaptadores externos
+- `PolicyDynamoRepository`: DynamoDB Enhanced Client com GSI em `customerId`
+- `FraudGatewayFeignAdapter`: OpenFeign com timeout de 3s (conexão) / 5s (leitura)
+- `PaymentResultsConsumer` / `SubscriptionResultsConsumer`: listeners SQS assíncronos
+- `InMemoryCorrelationStore`: correlaciona sinais de pagamento + subscrição com TTL e evicção agendada a cada 5 min
+
+---
+
+## Ciclo de Vida da Apólice
+
+```
+RECEIVED
+    │
+    ├─[fraude OK]──► VALIDATED
+    │                    │
+    │              [aguarda sinais]──► PENDING
+    │                                     │
+    │                         ┌───────────┤
+    │                         │           │
+    │                  [pagamento OK]  [subscrição OK]
+    │                         │           │
+    │                     APPROVED ◄──────┘ (ambos chegaram)
+    │
+    └─[fraude reprovada / pagamento negado / subscrição negada]──► REJECTED
+
+    Em qualquer estado não-final: CANCELLED (via PATCH /policies/{id}/cancel)
+```
+
+Cada transição é registrada no campo `history` da apólice com status e timestamp ISO-8601.
+
+---
+
+## Motor de Regras de Fraude
+
+As regras determinam o valor máximo segurado por combinação de **classificação do cliente** × **categoria do produto**:
+
+| Classificação | AUTO | RESIDENCIAL | VIDA | Outros |
+|---|---|---|---|---|
+| REGULAR | R$ 350.000 | R$ 500.000 | R$ 500.000 | R$ 255.000 |
+| HIGH_RISK | R$ 250.000 | R$ 150.000 | R$ 125.000 | R$ 125.000 |
+| PREFERENTIAL | R$ 450.000 | R$ 450.000 | R$ 800.000 | R$ 375.000 |
+| NO_INFO | R$ 75.000 | R$ 200.000 | R$ 200.000 | R$ 55.000 |
+
+Valor segurado acima do limite → apólice vai direto para `REJECTED` com motivo registrado no histórico.
+
+---
+
+## API
+
+| Método | Endpoint | Resposta | Descrição |
+|---|---|---|---|
+| `POST` | `/policies` | `201 + Location` | Cria solicitação de apólice |
+| `GET` | `/policies/{id}` | `200 / 404` | Consulta por ID |
+| `GET` | `/policies?customerId={uuid}` | `200 / 404` | Consulta por cliente |
+| `PATCH` | `/policies/{id}/cancel` | `204 / 404 / 409` | Cancela apólice |
+
+**Erros seguem RFC 7807** com campos adicionais:
+```json
+{
+  "type": "https://acme.com/errors/invalid-state-transition",
+  "title": "Invalid State Transition",
+  "status": 409,
+  "detail": "Cannot cancel a policy with status APPROVED",
+  "instance": "/policies/abc-123/cancel",
+  "policyId": "abc-123",
+  "currentStatus": "APPROVED",
+  "timestamp": "2025-06-15T14:32:00Z"
+}
+```
+
+---
+
+## Stack Utilizada
+
+| Camada | Tecnologia |
+|---|---|
+| Backend | Java 17, Spring Boot 3.5.4, Spring Cloud 2025.0.0 |
+| Arquitetura | Hexagonal (Ports & Adapters), DDD, State Machine |
+| Persistência | DynamoDB (Enhanced Client v2) com GSI |
+| Mensageria | AWS SQS via Spring Cloud AWS 3.4.0 |
+| Integração | OpenFeign (Fraud API) com timeout configurável |
+| Mapeamento | MapStruct 1.5.5 |
+| Observabilidade | Spring Actuator, Micrometer/Prometheus, OpenTelemetry + Jaeger |
+| Testes | JUnit 5, Mockito, AssertJ, Testcontainers, WireMock, Awaitility, Instancio |
+| Infra local | Docker Compose, LocalStack (DynamoDB + SQS), Jaeger |
+| Build | Maven (Surefire + Failsafe + JaCoCo ≥ 90%) |
+
+---
+
+## Decisões Técnicas
+
+### Arquitetura Hexagonal
+
+A separação entre domínio, casos de uso e infraestrutura foi a decisão mais importante do projeto. O domínio não conhece DynamoDB, SQS ou Feign — apenas portas (interfaces). Isso tornou possível testar a lógica de negócio de forma pura e substituir adaptadores sem tocar no core.
+
+### State Machine com Enum Dispatch
+
+Em vez de um `if/switch` centralizado, cada `PolicyStatus` sabe como transicionar. `PolicyStatus.PENDING.onPaymentConfirmed()` retorna o próximo estado. Isso elimina classes de estado separadas e mantém as regras perto de quem as usa.
+
+### InMemoryCorrelationStore para Sinais Assíncronos
+
+Pagamento e subscrição chegam de filas SQS independentes, em qualquer ordem. O `CorrelationStore` marca qual sinal chegou para cada `policyId`. Quando ambos estão presentes, o serviço aprova automaticamente. Não há polling nem coordenação síncrona — apenas estado local com TTL e evicção agendada.
+
+### WireMock em vez de Mocks In-Memory
+
+Para a API de fraude, optou-se por WireMock rodando como container Testcontainers. Isso testa a serialização HTTP real, headers, códigos de status e timeouts — comportamentos que mocks in-memory nunca exercitam. A URL do WireMock é injetada dinamicamente via `@DynamicPropertySource`.
+
+### Records Imutáveis para Entidades de Domínio
+
+`Policy` e `PolicyStatus.StatusHistory` são Java records. Imutabilidade elimina bugs de estado compartilhado, facilita o raciocínio sobre o código e alinha bem com o modelo de persistência no DynamoDB (cada write é um novo item, não uma mutação).
+
+### JaCoCo com Gate de 90%
+
+Cobertura mínima de 90% é verificada no build (`mvn verify`). Isso não é burocracia: a maioria das linhas não cobertas indicam caminhos de erro que valem testar — e foram testados.
+
+---
+
+## Desafios
+
+**Coordenação de eventos assíncronos sem transação distribuída**: garantir que a apólice seja aprovada apenas quando *ambos* os sinais chegaram, sem usar locks ou transações, exigiu modelar o `CorrelationStore` como uma estrutura de dados thread-safe com semântica de sinal.
+
+**Testes de integração com Testcontainers + LocalStack**: provisionar DynamoDB e SQS via LocalStack em container, criar tabelas e filas antes dos testes, e garantir isolamento entre suítes exigiu entender o ciclo de vida dos containers no JUnit 5.
+
+**WireMock com cenários dinâmicos**: simular timeout real da Fraud API (não apenas delay), resposta malformada e falha de conexão para testar os caminhos de erro do Feign `ErrorDecoder`.
+
+**Idempotência no cancelamento**: decidir o comportamento correto para cancelar uma apólice já cancelada (retornar 204 silenciosamente ou 409). A escolha foi idempotência — 204 — pois o cliente já atingiu o estado desejado.
+
+**Modelo de dados no DynamoDB**: mapear um campo `history` como `List<Map<String, String>>` no Enhanced Client exigiu anotações específicas e conversão customizada para manter o tipo correto durante leitura/escrita.
+
+---
+
+## Aprendizados
+
+**Técnicos**
+- Implementação prática de Ports & Adapters com Spring Boot: como estruturar pacotes, nomear interfaces e evitar vazamento de infraestrutura no domínio
+- Máquina de estados com enum dispatch é mais expressiva que condicionais espalhadas pelo código — e muito mais testável
+- `@DynamicPropertySource` é a forma correta de injetar URLs de containers Testcontainers em testes Spring Boot
+- WireMock + Testcontainers para testes de integração reprodutíveis: sem dependência de serviços externos, sem "funciona só na minha máquina"
+- Awaitility resolve elegantemente as asserções em fluxos assíncronos — sem `Thread.sleep` nos testes
+- OpenTelemetry com Java agent: correlação de trace IDs nos logs via Logback sem alterar o código da aplicação
+
+**Engenharia**
+- Consistência eventual tem trade-offs reais: o `CorrelationStore` em memória não sobrevive a restart — decisão aceitável para o contexto, mas documentada
+- A regra de fraude como função pura (`FraudRules.isApproved()`) tornou o código de domínio trivialmente testável com `@ParameterizedTest`
+- RFC 7807 em vez de respostas de erro ad-hoc: a padronização facilita muito o consumo por outros serviços e clientes
+
+**Mentalidade**
+- Modelar antes de implementar: definir os estados e transições no papel antes de escrever código economizou retrabalho
+- Evolução por release com intenção arquitetural: cada versão tem um aprendizado central, não apenas features novas
+- 90% de cobertura não é o objetivo — é a consequência de testar os caminhos que importam
+
+---
+
+## Próximos Passos
+
+- Migrar `InMemoryCorrelationStore` para Redis para suportar múltiplas instâncias sem perda de estado no restart
+- Implementar **Dead Letter Queue (DLQ)** para mensagens SQS que falham após N tentativas
+- Adicionar **Resilience4j** (Circuit Breaker + Retry) na chamada à Fraud API
+- Criar dashboard de observabilidade no **Grafana** com métricas de negócio (apólices por status, taxa de aprovação por categoria)
+- Implementar pipeline de **CI/CD** com GitHub Actions (build → testes → cobertura → deploy)
+- Deploy em **AWS** (ECS Fargate + DynamoDB + SQS reais) com infraestrutura como código via Terraform

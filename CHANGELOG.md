@@ -125,6 +125,24 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.1.0] - 2026-04-03
+
+### ✨ Added
+- documentação completa do projeto "ACME Policy Service" com 12 seções: Contexto, Problema, Solução, Arquitetura, Ciclo de Vida, Motor de Regras de Fraude, API, Stack Utilizada, Decisões Técnicas, Desafios, Aprendizados e Próximos Passos
+- diagrama de arquitetura SVG em `public/images/projects/acme-policy-service/cover.svg` (hexagonal + event-driven)
+- ícones de stack: `dynamodb.png`, `localstack.png`, `micrometer.png`, `opentelemetry.png` em `public/icons/stacks/`
+- ícone `aws-sqs.png` substituído por versão otimizada (417KB → 27KB)
+- mapeamentos adicionados em `lib/stack-assets.ts`: `dynamodb`, `localstack`, `micrometer`, `opentelemetry`
+- `remark-gfm` para suporte a tabelas GitHub Flavored Markdown no `MDXRemote`
+
+### 🔄 Changed
+- `tailwind.config.ts`: sobrescrita das pseudo-classes `code::before` e `code::after` do `@tailwindcss/typography` para remover backticks no inline code; estilização contextual de `:not(pre) > code` com fundo cinza e variante dark
+
+### 📦 Dependencies
+- adicionado `remark-gfm@^4.0.1`
+
+---
+
 ## [v1.0.0] - 2026-04-03
 
 ### ✨ Added

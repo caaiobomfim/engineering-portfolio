@@ -48,6 +48,7 @@ export const STACK_SLUGS: Record<string, string> = {
   // Observability
   grafana:          'grafana',
   prometheus:       'prometheus',
+  opentelemetry:    'opentelemetry',
 
   // CI/CD
   'github actions': 'githubactions',
