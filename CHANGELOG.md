@@ -125,6 +125,22 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v0.6.0] - 2026-04-02
+
+### ✨ Added
+- filtro por status na página `/certifications`: All / Active / Completed / Expired
+- agrupamento das certificações por entidade certificadora com contador dinâmico por grupo
+- contador por grupo reflete o filtro ativo (grupos vazios são omitidos automaticamente)
+- novo componente `CertificationsSection` (client component) responsável pelo estado de filtro, agrupamento e renderização
+- função `groupByIssuer()` em `lib/certifications.ts` para agrupar certificações por issuer preservando ordem de inserção
+- acessibilidade: botões de filtro com `aria-pressed` e `role="group"` com label descritivo
+
+### 🔄 Changed
+- `app/certifications/page.tsx` delegou a renderização interativa ao `CertificationsSection`, mantendo-se como Server Component
+- layout da listagem agora é organizado por issuer em vez de lista plana
+
+---
+
 ## [v0.5.0] - 2026-04-02
 
 ### ✨ Added
