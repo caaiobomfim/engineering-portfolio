@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { MDXRemote } from 'next-mdx-remote/rsc'
+import remarkGfm from 'remark-gfm'
 import { getAllProjects, getProjectBySlug } from '@/lib/projects'
 import { getTagColor } from '@/lib/tag-colors'
 
@@ -101,7 +102,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       </div>
 
       <div className="prose prose-gray dark:prose-invert max-w-none">
-        <MDXRemote source={project.content} />
+        <MDXRemote source={project.content} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
       </div>
 
       <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800">
