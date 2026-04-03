@@ -13,9 +13,9 @@ function lookupIcon(slug: string) {
 }
 
 const statusStyles: Record<CertificationStatus, string> = {
-  active: 'bg-green-50 text-green-700',
-  completed: 'bg-blue-50 text-blue-700',
-  expired: 'bg-gray-100 text-gray-500',
+  active: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  completed: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  expired: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500',
 }
 
 const statusLabels: Record<CertificationStatus, string> = {
@@ -64,7 +64,7 @@ export function CertificationCard({ certification }: CertificationCardProps) {
   return (
     <Wrapper
       {...(wrapperProps as object)}
-      className="border border-gray-200 rounded-xl bg-white p-5 hover:border-gray-400 hover:shadow-sm transition-all flex items-center gap-5"
+      className="border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900 p-5 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-sm transition-all flex items-center gap-5"
     >
       {/* Badge */}
       <div className="flex items-center justify-center w-24 h-24 shrink-0 overflow-hidden">
@@ -96,10 +96,10 @@ export function CertificationCard({ certification }: CertificationCardProps) {
 
       {/* Content */}
       <div className="flex flex-col gap-1.5 min-w-0">
-        <p className="text-xs text-gray-400">{issuer}</p>
-        <h2 className="text-sm font-semibold text-gray-600 leading-snug">{title}</h2>
+        <p className="text-xs text-gray-400 dark:text-gray-500">{issuer}</p>
+        <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-300 leading-snug">{title}</h2>
         {dateLabel && dateValue && (
-          <time dateTime={dateValue} className="text-xs text-gray-400 font-mono">
+          <time dateTime={dateValue} className="text-xs text-gray-400 dark:text-gray-500 font-mono">
             {dateLabel} {formatDate(dateValue)}
           </time>
         )}

@@ -39,8 +39,8 @@ export function CertificationsSection({ certifications }: Props) {
             aria-pressed={activeFilter === value}
             className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
               activeFilter === value
-                ? 'bg-gray-900 text-white'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
+                : 'bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
             }`}
           >
             {label}
@@ -52,7 +52,7 @@ export function CertificationsSection({ certifications }: Props) {
       <div className="mt-8 space-y-8">
         {groups.map(({ issuer, items }) => (
           <div key={issuer}>
-            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            <h2 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
               {issuer}{' '}
               <span className="font-normal normal-case tracking-normal">({items.length})</span>
             </h2>

@@ -19,7 +19,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-bold text-gray-900">Projetos</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Projetos</h1>
       <div className="mt-8">
         <ProjectsSection
           projects={projects}

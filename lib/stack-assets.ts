@@ -19,7 +19,6 @@ export const STACK_ASSETS: Record<string, string> = {
   // Testing
   testcontainers: '/icons/stacks/testcontainers.png',
   wiremock:       '/icons/stacks/wiremock.png',
-  openfeign:      '/icons/stacks/openfeign.png',
 }
 
 export function getStackAsset(name: string): string | null {
