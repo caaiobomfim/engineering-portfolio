@@ -16,6 +16,8 @@ export interface Project {
   featured: boolean
   order: number
   cover: string
+  /** simple-icons slug for the project icon */
+  icon?: string
   github?: string
   demo?: string
   date: string
@@ -41,6 +43,7 @@ function parseProject(filename: string): Project {
     featured: (data.featured as boolean) ?? false,
     order: (data.order as number) ?? 999,
     cover: (data.cover as string) ?? '/images/projects/placeholder/cover.svg',
+    icon: data.icon as string | undefined,
     github: data.github as string | undefined,
     demo: data.demo as string | undefined,
     date: (data.date as string) ?? '',
@@ -85,6 +88,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectWithContent
     featured: (data.featured as boolean) ?? false,
     order: (data.order as number) ?? 999,
     cover: (data.cover as string) ?? '/images/projects/placeholder/cover.svg',
+    icon: data.icon as string | undefined,
     github: data.github as string | undefined,
     demo: data.demo as string | undefined,
     date: (data.date as string) ?? '',
