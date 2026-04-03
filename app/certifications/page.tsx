@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { getCertifications } from '@/lib/certifications'
-import { CertificationCard } from '@/components/certification/CertificationCard'
+import { CertificationsSection } from '@/components/certification/CertificationsSection'
 
 export const metadata: Metadata = {
   title: 'Certificações',
@@ -16,12 +16,7 @@ export default function CertificationsPage() {
       <p className="mt-2 text-sm text-gray-500">
         Certificações técnicas em cloud, infraestrutura e engenharia de software.
       </p>
-
-      <div className="mt-8 grid gap-4 grid-cols-1 sm:grid-cols-2">
-        {certifications.map((cert) => (
-          <CertificationCard key={cert.id} certification={cert} />
-        ))}
-      </div>
+      <CertificationsSection certifications={certifications} />
     </div>
   )
 }

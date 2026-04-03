@@ -108,6 +108,17 @@ export const certifications: Certification[] = [
   },
 ]
 
+export function groupByIssuer(
+  certs: Certification[]
+): { issuer: string; items: Certification[] }[] {
+  const map = new Map<string, Certification[]>()
+  for (const cert of certs) {
+    if (!map.has(cert.issuer)) map.set(cert.issuer, [])
+    map.get(cert.issuer)!.push(cert)
+  }
+  return Array.from(map.entries()).map(([issuer, items]) => ({ issuer, items }))
+}
+
 export function getCertifications(): Certification[] {
   const statusOrder: Record<CertificationStatus, number> = {
     active: 0,
