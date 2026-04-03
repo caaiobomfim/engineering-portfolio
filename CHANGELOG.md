@@ -125,6 +125,14 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v0.6.1] - 2026-04-02
+
+### 🗑️ Removed
+- removidas 8 imagens de badge não utilizadas de `public/images/certifications/`: `certiprof-lgpd.png`, `certiprof-lifelong-learning.png`, `certiprof-sfpc.png`, `itau-change-management.png`, `itau-dna-foundation.png`, `itau-engenharia-do-caos.png`, `itau-qualidade-em-mudancas.png`, `itau-sre.png`
+- mantidas apenas as 5 imagens em uso: `aws-cloud-practitioner.png`, `aws-developer-associate.png`, `aws-solutions-architect-associate.png`, `itau.png`, `certiprof.png`
+
+---
+
 ## [v0.6.0] - 2026-04-02
 
 ### ✨ Added
