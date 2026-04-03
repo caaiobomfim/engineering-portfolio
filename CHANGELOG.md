@@ -125,6 +125,13 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v0.6.2] - 2026-04-02
+
+### 🎨 UI
+- adicionado `app/favicon.ico` com ícone personalizado exibido na aba do navegador
+
+---
+
 ## [v0.6.1] - 2026-04-02
 
 ### 🗑️ Removed
