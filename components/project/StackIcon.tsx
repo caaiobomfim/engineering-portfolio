@@ -24,13 +24,13 @@ export function StackIcon({ name }: StackIconProps) {
     return (
       <span
         title={name}
-        className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+        className="flex items-center justify-center w-7 h-7 rounded-md bg-gray-50 border border-gray-100"
       >
         <svg
           role="img"
           viewBox="0 0 24 24"
-          width={18}
-          height={18}
+          width={16}
+          height={16}
           fill={`#${icon.hex}`}
           aria-label={icon.title}
         >
@@ -43,7 +43,7 @@ export function StackIcon({ name }: StackIconProps) {
   return (
     <span
       title={name}
-      className="flex items-center h-8 px-2 rounded-lg bg-gray-100 text-xs font-mono text-gray-600 hover:bg-gray-200 transition-colors whitespace-nowrap"
+      className="flex items-center h-7 px-2 rounded-md bg-gray-50 border border-gray-100 text-xs font-mono text-gray-400 whitespace-nowrap"
     >
       {name}
     </span>

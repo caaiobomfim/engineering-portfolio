@@ -125,6 +125,28 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v0.9.0] - 2026-04-03
+
+### ✨ Added
+- biblioteca personalizada de ícones de stack em `public/icons/stacks/` com assets para Java, AWS SQS, OpenFeign, WireMock e Testcontainers
+- `lib/stack-assets.ts` — mapa centralizado de stack name → asset local; adicionar novo ícone requer apenas colocar o arquivo e adicionar uma entrada
+- `lib/project-icons.ts` — mapa de ícones de projeto via `lucide-react`, com paleta contextual por projeto (cor de fundo + borda + ícone)
+- `components/project/StackBadge.tsx` — substitui `StackIcon` com resolução em 3 camadas: asset local → simple-icons → fallback texto
+
+### 🔄 Changed
+- ícone do projeto "Sistema de Título de Capitalização": `bitcoin` → `Landmark` (lucide-react, azul institucional)
+- ícone do projeto "REST Countries API": `openstreetmap` → `Globe2` (lucide-react, verde-esmeralda)
+- `project-card.tsx` atualizado para usar `StackBadge` e `getProjectIcon()` de `lib/project-icons.ts`
+- `lib/stack-icons.ts` — adicionado mapeamento para `junit 5` / `junit5` (simple-icons `siJunit5`)
+- stack do projeto "Sistema de Título de Capitalização": removidos `DDD` e `Clean Architecture`
+- `ProjectCard` redesenhado: cantos `rounded-xl`, `shadow-sm`, hover com `shadow-md + -translate-y-0.5`, separador `border-t` antes da stack e indicador "Ver projeto →"
+- `StackBadge`: tamanho `w-7 h-7`, `rounded-md`, fundo `gray-50` com borda `gray-100` — visual consistente entre ícones e texto
+
+### 📦 Dependencies
+- adicionado `lucide-react`
+
+---
+
 ## [v0.8.0] - 2026-04-03
 
 ### ✨ Added
