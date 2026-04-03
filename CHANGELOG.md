@@ -125,6 +125,30 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.0.0] - 2026-04-03
+
+### ✨ Added
+- modo escuro completo com suporte a preferência do sistema e toggle manual
+- `next-themes` para gerenciamento de tema com persistência via `localStorage`
+- `components/providers.tsx` — `ThemeProvider` com `attribute="class"`, `defaultTheme="system"` e `enableSystem`
+- `components/layout/ThemeToggle.tsx` — botão com ícones `Sun`/`Moon` (lucide-react), proteção contra hydration mismatch
+
+### 🔄 Changed
+- `tailwind.config.ts`: adicionado `darkMode: 'class'`
+- `styles/globals.css`: adicionado `dark:bg-gray-950 dark:text-gray-100` ao body
+- `app/layout.tsx`: `<html>` com `suppressHydrationWarning`, layout envolvido pelo `Providers`, footer com variantes dark
+- `components/layout/header.tsx`: variantes dark em todos os elementos + `ThemeToggle` ao lado da nav
+- todos os componentes atualizados com variantes `dark:`: `ProjectCard`, `StackBadge`, `CertificationCard`, `CertificationsSection`, `SearchInput`, `TagFilter`, `ProjectsSection`
+- `lib/tag-colors.ts`: paleta de tags com variantes dark (`dark:bg-*/30`, `dark:text-*-300`)
+- `lib/project-icons.ts`: paletas contextuais dos ícones de projeto com variantes dark
+- todas as páginas (`/`, `/projects`, `/certifications`, `/projects/[slug]`, `not-found`) com variantes dark
+- conteúdo MDX com `dark:prose-invert`
+
+### 🗑️ Removed
+- ícone personalizado do OpenFeign removido (`openfeign.png` apagado, entrada removida de `stack-assets.ts`); OpenFeign retorna ao text badge
+
+---
+
 ## [v0.9.0] - 2026-04-03
 
 ### ✨ Added

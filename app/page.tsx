@@ -15,14 +15,14 @@ export default async function HomePage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-16">
       <section>
-        <h1 className="text-3xl font-bold text-gray-900">Caio Bomfim Godoy</h1>
-        <p className="mt-3 text-lg text-gray-500 max-w-xl">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Caio Bomfim Godoy</h1>
+        <p className="mt-3 text-lg text-gray-500 dark:text-gray-400 max-w-xl">
           Engenheiro de software focado em sistemas distribuídos, APIs e experiências técnicas com profundidade.
         </p>
         <div className="mt-6">
           <Link
             href="/projects"
-            className="inline-block rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors"
+            className="inline-block rounded-md bg-gray-900 dark:bg-gray-100 px-4 py-2 text-sm font-medium text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors"
           >
             Ver projetos
           </Link>
@@ -31,7 +31,7 @@ export default async function HomePage() {
 
       {featured.length > 0 && (
         <section className="mt-16">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-6">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-6">
             Projetos em destaque
           </h2>
           <div className="grid gap-6 sm:grid-cols-2">
@@ -41,7 +41,7 @@ export default async function HomePage() {
           </div>
           {all.length > featured.length && (
             <div className="mt-8">
-              <Link href="/projects" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+              <Link href="/projects" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
                 Ver todos os projetos →
               </Link>
             </div>
@@ -51,7 +51,7 @@ export default async function HomePage() {
 
       {featuredCerts.length > 0 && (
         <section className="mt-16">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-6">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-6">
             Certificações em destaque
           </h2>
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
@@ -61,7 +61,7 @@ export default async function HomePage() {
           </div>
           {allCerts.length > featuredCerts.length && (
             <div className="mt-8">
-              <Link href="/certifications" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+              <Link href="/certifications" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
                 Ver todas as certificações →
               </Link>
             </div>

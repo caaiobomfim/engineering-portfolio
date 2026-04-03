@@ -12,8 +12,8 @@ export default function CertificationsPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-bold text-gray-900">Certificações</h1>
-      <p className="mt-2 text-sm text-gray-500">
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Certificações</h1>
+      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
         Certificações técnicas em cloud, infraestrutura e engenharia de software.
       </p>
       <CertificationsSection certifications={certifications} />

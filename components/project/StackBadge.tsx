@@ -8,8 +8,8 @@ function lookupSimpleIcon(slug: string) {
   return (simpleIcons as Record<string, { hex: string; path: string; title: string } | undefined>)[key] ?? null
 }
 
-const badgeBase = 'flex items-center justify-center w-7 h-7 rounded-md bg-gray-50 border border-gray-100'
-const textBadgeBase = 'flex items-center h-7 px-2 rounded-md bg-gray-50 border border-gray-100 text-xs font-mono text-gray-400 whitespace-nowrap'
+const badgeBase = 'flex items-center justify-center w-7 h-7 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700'
+const textBadgeBase = 'flex items-center h-7 px-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-xs font-mono text-gray-400 dark:text-gray-500 whitespace-nowrap'
 
 interface StackBadgeProps {
   name: string

@@ -89,7 +89,7 @@ export function ProjectsSection({
         />
       )}
 
-      <p className="text-sm text-gray-500">{countLabel}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">{countLabel}</p>
 
       {filteredProjects.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2">
@@ -121,13 +121,13 @@ interface EmptyStateProps {
 function EmptyState({ hasQuery, hasTags, onClearSearch, onClearTags }: EmptyStateProps) {
   return (
     <div className="py-16 text-center">
-      <p className="text-sm text-gray-500">Nenhum projeto encontrado.</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum projeto encontrado.</p>
       <div className="mt-3 flex justify-center gap-3">
         {hasQuery && (
           <button
             type="button"
             onClick={onClearSearch}
-            className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 transition-colors"
+            className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 underline underline-offset-2 transition-colors"
           >
             Limpar busca
           </button>
@@ -136,7 +136,7 @@ function EmptyState({ hasQuery, hasTags, onClearSearch, onClearTags }: EmptyStat
           <button
             type="button"
             onClick={onClearTags}
-            className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 transition-colors"
+            className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 underline underline-offset-2 transition-colors"
           >
             Limpar filtros de tag
           </button>
