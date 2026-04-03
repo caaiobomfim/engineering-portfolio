@@ -125,6 +125,17 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v0.8.0] - 2026-04-03
+
+### ✨ Added
+- seção "Certificações em destaque" na página home, exibida abaixo dos projetos em destaque
+- campo `featured?: boolean` na interface `Certification` em `lib/certifications.ts`
+- função `getFeaturedCertifications()` que filtra e retorna certificações marcadas como destaque
+- 3 certificações AWS marcadas como `featured: true`: Cloud Practitioner, Developer – Associate e Solutions Architect – Associate
+- link "Ver todas as certificações →" exibido quando há mais certificações além das em destaque
+
+---
+
 ## [v0.7.0] - 2026-04-02
 
 ### ✨ Added

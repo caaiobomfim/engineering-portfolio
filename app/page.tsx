@@ -1,9 +1,16 @@
 import Link from 'next/link'
 import { getFeaturedProjects, getAllProjects } from '@/lib/projects'
+import { getFeaturedCertifications, getCertifications } from '@/lib/certifications'
 import { ProjectCard } from '@/components/project/project-card'
+import { CertificationCard } from '@/components/certification/CertificationCard'
 
 export default async function HomePage() {
-  const [featured, all] = await Promise.all([getFeaturedProjects(), getAllProjects()])
+  const [featured, all, featuredCerts, allCerts] = await Promise.all([
+    getFeaturedProjects(),
+    getAllProjects(),
+    getFeaturedCertifications(),
+    getCertifications(),
+  ])
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-16">
@@ -36,6 +43,26 @@ export default async function HomePage() {
             <div className="mt-8">
               <Link href="/projects" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
                 Ver todos os projetos →
+              </Link>
+            </div>
+          )}
+        </section>
+      )}
+
+      {featuredCerts.length > 0 && (
+        <section className="mt-16">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-6">
+            Certificações em destaque
+          </h2>
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+            {featuredCerts.map((cert) => (
+              <CertificationCard key={cert.id} certification={cert} />
+            ))}
+          </div>
+          {allCerts.length > featuredCerts.length && (
+            <div className="mt-8">
+              <Link href="/certifications" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                Ver todas as certificações →
               </Link>
             </div>
           )}

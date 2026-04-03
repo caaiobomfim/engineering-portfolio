@@ -11,6 +11,7 @@ export interface Certification {
   issuedDate?: string
   expirationDate?: string
   status: CertificationStatus
+  featured?: boolean
   credentialUrl?: string
 }
 
@@ -23,6 +24,7 @@ export const certifications: Certification[] = [
     badgeUrl: '/images/certifications/aws-cloud-practitioner.png',
     expirationDate: '2027-09-28',
     status: 'active',
+    featured: true,
   },
   {
     id: 'aws-developer-associate',
@@ -31,6 +33,7 @@ export const certifications: Certification[] = [
     badgeUrl: '/images/certifications/aws-developer-associate.png',
     expirationDate: '2027-08-30',
     status: 'active',
+    featured: true,
   },
   {
     id: 'aws-solutions-architect-associate',
@@ -39,6 +42,7 @@ export const certifications: Certification[] = [
     badgeUrl: '/images/certifications/aws-solutions-architect-associate.png',
     expirationDate: '2027-09-28',
     status: 'active',
+    featured: true,
   },
   // Itaú – completed
   {
@@ -117,6 +121,10 @@ export function groupByIssuer(
     map.get(cert.issuer)!.push(cert)
   }
   return Array.from(map.entries()).map(([issuer, items]) => ({ issuer, items }))
+}
+
+export function getFeaturedCertifications(): Certification[] {
+  return getCertifications().filter((c) => c.featured)
 }
 
 export function getCertifications(): Certification[] {
