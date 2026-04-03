@@ -125,6 +125,20 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v0.7.0] - 2026-04-02
+
+### ✨ Added
+- campo `icon` no frontmatter dos projetos MDX para associar um ícone `simple-icons` a cada projeto
+- parsing do campo `icon` em `lib/projects.ts`
+
+### 🔄 Changed
+- layout do `ProjectCard` redesenhado: ícone à esquerda (64px), título e resumo à direita, stack na parte inferior (full width)
+- projeto "Sistema de Título de Capitalização" usa ícone `bitcoin`
+- projeto "REST Countries API" usa ícone `openstreetmap`
+- "Journey Lab —" removido dos títulos dos dois projetos
+
+---
+
 ## [v0.6.2] - 2026-04-02
 
 ### 🎨 UI
