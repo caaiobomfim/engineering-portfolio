@@ -17,7 +17,7 @@ export default function CertificationsPage() {
         Certificações técnicas em cloud, infraestrutura e engenharia de software.
       </p>
 
-      <div className="mt-8 grid gap-6 sm:grid-cols-2">
+      <div className="mt-8 grid gap-4 grid-cols-1 sm:grid-cols-2">
         {certifications.map((cert) => (
           <CertificationCard key={cert.id} certification={cert} />
         ))}

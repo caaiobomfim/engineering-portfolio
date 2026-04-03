@@ -125,6 +125,30 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v0.5.0] - 2026-04-02
+
+### ✨ Added
+- 11 certificações reais substituindo os dados mockados da v0.4.0: 3 AWS (Cloud Practitioner, Developer Associate, Solutions Architect Associate), 5 Itaú Unibanco (Change Management, Engenharia do Caos, D&A Foundation, Qualidade em Mudanças, SRE) e 3 Certiprof (LGPD, Lifelong Learning, SFPC)
+- campo `badgeUrl` na interface `Certification` para suporte a imagens de badge personalizadas
+- campos `issuedDate` e `expirationDate` separados (substituindo `issueDate` único) para controle preciso de datas por tipo de status
+- imagens de badge reais em `public/images/certifications/` para todas as 11 certificações
+- prefixos de data contextuais: `Expires` (ativas), `Issued` (concluídas), `Expired` (expiradas)
+
+### 🔄 Changed
+- tipo `CertificationStatus` migrado de `'Concluída' | 'Em andamento' | 'Expirada'` para `'active' | 'completed' | 'expired'`
+- layout do `CertificationCard` redesenhado: badge à esquerda (96px) e conteúdo à direita em duas colunas, inspirado no Credly
+- ordem do conteúdo no card: certificadora → título → data → badge de status
+- grid da página `/certifications` ajustado para `grid-cols-1 sm:grid-cols-2`
+- certificações Itaú usam logo unificado `itau.png`; certificações Certiprof usam logo unificado `certiprof.png`
+- `getCertifications()` ordena por status (active → completed → expired) e por data decrescente dentro de cada grupo
+- data formatada em inglês (`en-US`) com dia, mês abreviado e ano
+
+### 🗑️ Removed
+- campo `description` da interface `Certification` e da renderização do card
+- lookup de ícones via `simple-icons` para emissores (substituído por `badgeUrl`)
+
+---
+
 ## [v0.4.0] - 2026-04-01
 
 ### ✨ Added
