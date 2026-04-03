@@ -125,6 +125,13 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.1.1] - 2026-04-03
+
+### ✨ Added
+- imagem do diagrama de arquitetura do ecossistema de seguros (`desafio-arquitetura.png`) adicionada à página do ACME Policy Service
+
+---
+
 ## [v1.1.0] - 2026-04-03
 
 ### ✨ Added
