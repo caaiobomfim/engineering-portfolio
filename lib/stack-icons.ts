@@ -22,6 +22,10 @@ export const STACK_SLUGS: Record<string, string> = {
   'spring boot':    'spring',
   spring:           'spring',
 
+  // Testing
+  'junit 5':        'junit5',
+  junit5:           'junit5',
+
   // Databases
   postgresql:       'postgresql',
   postgres:         'postgresql',
