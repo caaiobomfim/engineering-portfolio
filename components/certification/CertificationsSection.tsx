@@ -107,25 +107,17 @@ export function CertificationsSection({ certifications }: Props) {
           <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">
             Emissor
           </p>
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por emissor">
-            <button
-              onClick={() => setActiveIssuer('all')}
-              aria-pressed={activeIssuer === 'all'}
-              className={chipClass(activeIssuer === 'all')}
-            >
-              Todos
-            </button>
+          <select
+            value={activeIssuer}
+            onChange={(e) => setActiveIssuer(e.target.value)}
+            aria-label="Filtrar por emissor"
+            className="px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 cursor-pointer"
+          >
+            <option value="all">Todos os emissores</option>
             {issuers.map(({ issuer, short }) => (
-              <button
-                key={issuer}
-                onClick={() => setActiveIssuer(issuer)}
-                aria-pressed={activeIssuer === issuer}
-                className={chipClass(activeIssuer === issuer)}
-              >
-                {short}
-              </button>
+              <option key={issuer} value={issuer}>{short}</option>
             ))}
-          </div>
+          </select>
         </div>
       </div>
 

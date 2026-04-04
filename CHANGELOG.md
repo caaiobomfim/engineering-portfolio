@@ -4,6 +4,13 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.3.4] - 2026-04-04
+
+### 🎨 UI
+- Filtro de emissor na página de certificações substituído por um `<select>` combobox, eliminando a linha de chips e simplificando a UI do painel de filtros
+
+---
+
 ## [v1.3.3] - 2026-04-04
 
 ### 🎨 UI
