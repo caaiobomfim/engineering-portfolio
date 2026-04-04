@@ -8,6 +8,7 @@ const navLinks = [
   { href: '/', label: 'Home', exact: true },
   { href: '/projects', label: 'Projetos', exact: false },
   { href: '/certifications', label: 'Certificações', exact: false },
+  { href: '/reading', label: 'Leitura', exact: false },
 ]
 
 export function Header() {
