@@ -12,6 +12,15 @@ function lookupIcon(slug: string) {
   )[key] ?? null
 }
 
+const issuerAccent: Record<string, string> = {
+  'Amazon Web Services Training and Certification': 'bg-[#FF9900]',
+  'Cloud Native Computing Foundation': 'bg-[#0086FF]',
+  'HashiCorp': 'bg-[#7B42BC]',
+  'Datadog': 'bg-[#632CA6]',
+  'Itaú Unibanco': 'bg-orange-600',
+  'Certiprof': 'bg-[#003087]',
+}
+
 const statusStyles: Record<CertificationStatus, string> = {
   active: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   planned: 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
@@ -73,8 +82,11 @@ export function CertificationCard({ certification }: CertificationCardProps) {
   return (
     <Wrapper
       {...(wrapperProps as object)}
-      className={`border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900 p-5 transition-all flex items-center gap-5 ${plannedStyles}`}
+      className={`relative overflow-hidden border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900 p-5 transition-all flex items-center gap-5 ${plannedStyles}`}
     >
+      {/* Issuer accent stripe */}
+      <div className={`absolute top-0 left-0 right-0 h-1 ${issuerAccent[issuer] ?? 'bg-gray-200 dark:bg-gray-700'}`} />
+
       {/* Badge */}
       <div className="flex items-center justify-center w-24 h-24 shrink-0 overflow-hidden">
         {badgeUrl ? (
