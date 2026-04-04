@@ -4,6 +4,23 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.3.0] - 2026-04-04
+
+### ✨ Added
+- **Painel de estatísticas** na página de certificações: cards com contagem de Total, Ativas, Planejadas, Concluídas e Expiradas — sempre refletindo o portfólio completo independente dos filtros ativos
+- **Busca por nome** na página de certificações: campo de texto com filtragem em tempo real; combina com os demais filtros
+- **Filtro por emissor**: chips dinâmicos gerados a partir dos dados (AWS, CNCF, Itaú Unibanco, Certiprof) — funciona em combinação com filtro de status e busca; estado vazio com mensagem "Nenhuma certificação encontrada."
+- **Status `planned`** para certificações: novo status "Planejada" com badge âmbar e borda tracejada nos cards; adicionado ao tipo `CertificationStatus`, ao sort order e aos filtros de status
+- Adicionadas 3 certificações planejadas: **AWS Certified SysOps Administrator – Associate**, **AWS Certified DevOps Engineer – Professional** e **Certified Kubernetes Application Developer (CKAD)**
+- Campo `issuerShort` opcional na interface `Certification` para exibição abreviada nos chips de filtro (ex: "AWS" em vez de "Amazon Web Services Training and Certification")
+- Correção no `next.config.ts`: adicionado `turbopack.root: __dirname` para resolver aviso de workspace root em ambientes com múltiplos lockfiles
+
+### 🔧 Changed
+- `CertificationsSection`: labels de filtro de status atualizados de inglês para português ("All" → "Todas", "Active" → "Ativas", etc.) para consistência com o restante da UI em português
+- `CertificationCard`: remoção do hover shadow/border para cards com status `planned` (substituído por estilo de borda tracejada + opacidade reduzida)
+
+---
+
 ## [v1.2.0] - 2026-04-04
 
 ### ✨ Added

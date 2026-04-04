@@ -1,9 +1,11 @@
-export type CertificationStatus = 'active' | 'completed' | 'expired'
+export type CertificationStatus = 'active' | 'planned' | 'completed' | 'expired'
 
 export interface Certification {
   id: string
   title: string
   issuer: string
+  /** Short display name for the issuer — used in filter chips */
+  issuerShort?: string
   /** simple-icons slug for the issuer logo (see https://simpleicons.org) */
   issuerSlug?: string
   /** path relative to /public for a custom badge image */
@@ -21,6 +23,7 @@ export const certifications: Certification[] = [
     id: 'aws-cloud-practitioner',
     title: 'AWS Certified Cloud Practitioner',
     issuer: 'Amazon Web Services Training and Certification',
+    issuerShort: 'AWS',
     badgeUrl: '/images/certifications/aws-cloud-practitioner.png',
     expirationDate: '2027-09-28',
     status: 'active',
@@ -30,6 +33,7 @@ export const certifications: Certification[] = [
     id: 'aws-developer-associate',
     title: 'AWS Certified Developer – Associate',
     issuer: 'Amazon Web Services Training and Certification',
+    issuerShort: 'AWS',
     badgeUrl: '/images/certifications/aws-developer-associate.png',
     expirationDate: '2027-08-30',
     status: 'active',
@@ -39,10 +43,34 @@ export const certifications: Certification[] = [
     id: 'aws-solutions-architect-associate',
     title: 'AWS Certified Solutions Architect – Associate',
     issuer: 'Amazon Web Services Training and Certification',
+    issuerShort: 'AWS',
     badgeUrl: '/images/certifications/aws-solutions-architect-associate.png',
     expirationDate: '2027-09-28',
     status: 'active',
     featured: true,
+  },
+  // AWS – planned
+  {
+    id: 'aws-sysops-administrator-associate',
+    title: 'AWS Certified SysOps Administrator – Associate',
+    issuer: 'Amazon Web Services Training and Certification',
+    issuerShort: 'AWS',
+    status: 'planned',
+  },
+  {
+    id: 'aws-devops-engineer-professional',
+    title: 'AWS Certified DevOps Engineer – Professional',
+    issuer: 'Amazon Web Services Training and Certification',
+    issuerShort: 'AWS',
+    status: 'planned',
+  },
+  // CNCF – planned
+  {
+    id: 'ckad',
+    title: 'Certified Kubernetes Application Developer – CKAD',
+    issuer: 'Cloud Native Computing Foundation',
+    issuerShort: 'CNCF',
+    status: 'planned',
   },
   // Itaú – completed
   {
@@ -130,8 +158,9 @@ export function getFeaturedCertifications(): Certification[] {
 export function getCertifications(): Certification[] {
   const statusOrder: Record<CertificationStatus, number> = {
     active: 0,
-    completed: 1,
-    expired: 2,
+    planned: 1,
+    completed: 2,
+    expired: 3,
   }
 
   return [...certifications].sort((a, b) => {
