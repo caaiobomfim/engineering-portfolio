@@ -4,6 +4,24 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.2.0] - 2026-04-04
+
+### ✨ Added
+- complementadas informações do projeto **REST Countries API** com base no código-fonte real (v0.1.0):
+  - stack corrigida: Java 21, Spring Boot 3.4.8, Spring Cloud 2024.0.2; removido Testcontainers (não presente no v0.1.0); adicionados Lombok, OpenFeign e Spring Boot Actuator
+  - summary atualizado para refletir o foco em **SRE e DevOps** (não apenas testes de integração)
+  - seção de contexto reescrita para incluir o objetivo de migração para SRE/Cloud/DevOps
+  - arquitetura atualizada com a interface `CountryServicePort` e WireMock via Docker Compose standalone
+  - seção **API** adicionada: endpoint `GET /countries/{name}` e estrutura de resposta documentados
+  - decisões técnicas revisadas: WireMock via Docker Compose (não Testcontainers), Records para DTOs
+  - "Próximos Passos" substituído por **roadmap de releases** real (10 releases planejadas, v0.1 → v1.0)
+- complementadas informações do projeto **ACME Policy Service** com base no README e CHANGELOG do repositório:
+  - seção **Premissas e Decisões de Design** adicionada: contratos de eventos SQS, comportamento do WireMock com response templating, idempotência no cancelamento, decisões de consistência
+  - seção **Cenários de Teste** adicionada com 4 cenários detalhados (REJECTED por fraude, APPROVED via eventos, REJECTED por pagamento negado, CANCELLED)
+  - menção aos scripts shell (`tools/scripts/`) e à coleção Insomnia disponível em `docs/`
+
+---
+
 ## [v0.1.0] - 2026-03-29
 
 ### ✨ Added

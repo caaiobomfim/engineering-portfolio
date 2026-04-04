@@ -265,6 +265,53 @@ Cobertura mínima de 90% é verificada no build (`mvn verify`). Isso não é bur
 
 ---
 
+## Premissas e Decisões de Design
+
+Quando o enunciado não especificou detalhes, foram adotadas premissas explícitas para manter o sistema consistente e testável:
+
+**Contratos de eventos SQS:**
+- `payment-topic`: `status ∈ { CONFIRMED, DENIED }` com `requestId`, `paymentId`, `occurredAt`
+- `insurance-subscriptions-topic`: `status ∈ { AUTHORIZED, DENIED }` com `requestId`, `occurredAt`
+- **Regra de composição**: `CONFIRMED + AUTHORIZED → Policy.APPROVED`; qualquer `DENIED → Policy.REJECTED`; ausência de um dos eventos → `Policy.PENDING`
+
+**Fraud API (WireMock):** responde com classificação aleatória via *response templating*. Isso exercita todas as ramificações das regras de fraude e evita acoplamento a fixtures estáticos — aproximando o comportamento dos testes do mundo real.
+
+**Cancelamento idempotente:** PATCH retorna `204 No Content`. Políticas já `CANCELLED` não geram erro — o cliente já atingiu o estado desejado.
+
+**Consistência eventual aceitável:** o `InMemoryCorrelationStore` não sobrevive a restarts — decisão consciente para o escopo do estudo, documentada e com caminho claro de migração para Redis em produção.
+
+**Erros neutros para clientes:** respostas RFC 7807 com mensagens sem vazar detalhes de upstream; detalhes completos ficam nos logs/traces com correlation ID.
+
+---
+
+## Cenários de Teste
+
+### Cenário A — REJECTED por regra de fraude
+1. Envie `POST /policies` com `insured_amount` acima do limite da classificação de risco retornada pelo WireMock
+2. Verifique `status: REJECTED` na resposta ou via `GET /policies/{id}`
+
+### Cenário B — PENDING → APPROVED (fluxo completo)
+1. Envie `POST /policies` e confirme `status: PENDING`
+2. Publique evento de pagamento aprovado na fila `payment-topic`
+3. Publique evento de subscrição autorizada na fila `insurance-subscriptions-topic`
+4. Consulte `GET /policies/{id}` → `status: APPROVED`
+
+### Cenário C — PENDING → REJECTED (pagamento negado)
+1. Envie `POST /policies` e confirme `status: PENDING`
+2. Publique evento de pagamento negado na fila `payment-topic`
+3. Consulte `GET /policies/{id}` → `status: REJECTED`
+
+### Cenário D — PENDING → CANCELLED
+1. Envie `POST /policies` e confirme `status: PENDING`
+2. Envie `PATCH /policies/{id}/cancel` → `204 No Content`
+3. Consulte `GET /policies/{id}` → `status: CANCELLED`
+
+Scripts shell para publicar eventos SQS via LocalStack estão disponíveis em `tools/scripts/` (`send-payment-approved.sh`, `send-payment-denied.sh`, `send-subscription-approved.sh`, `send-subscription-denied.sh`).
+
+Uma **coleção do Insomnia** com todas as requisições prontas está disponível em `docs/acme-policy-service-collection.json`.
+
+---
+
 ## Próximos Passos
 
 - Migrar `InMemoryCorrelationStore` para Redis para suportar múltiplas instâncias sem perda de estado no restart
