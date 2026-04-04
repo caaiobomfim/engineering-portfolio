@@ -4,6 +4,14 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.3.3] - 2026-04-04
+
+### 🎨 UI
+- Filtros da página de certificações reorganizados em um painel unificado com fundo sutil e divisores entre seções (Opção B); cada grupo agora tem um label "STATUS" e "EMISSOR" para eliminar ambiguidade visual entre os dois conjuntos de chips
+- Label "Todos emissores" encurtado para "Todos" dentro do painel para melhor aproveitamento de espaço
+
+---
+
 ## [v1.3.2] - 2026-04-04
 
 ### ✨ Added

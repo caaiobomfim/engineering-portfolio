@@ -84,50 +84,63 @@ export function CertificationsSection({ certifications }: Props) {
         ))}
       </div>
 
-      {/* Search */}
-      <div className="mt-6">
-        <input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar certificação..."
-          className="w-full sm:max-w-xs px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600"
-        />
-      </div>
+      {/* Filters panel */}
+      <div className="mt-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/50 divide-y divide-gray-200 dark:divide-gray-700">
+        {/* Search row */}
+        <div className="px-4 py-3">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar certificação..."
+            className="w-full sm:max-w-xs px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600"
+          />
+        </div>
 
-      {/* Status filter */}
-      <div className="flex flex-wrap gap-2 mt-4" role="group" aria-label="Filtrar por status">
-        {statusFilters.map(({ value, label }) => (
-          <button
-            key={value}
-            onClick={() => setActiveStatus(value)}
-            aria-pressed={activeStatus === value}
-            className={chipClass(activeStatus === value)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+        {/* Status filter */}
+        <div className="px-4 py-3">
+          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">
+            Status
+          </p>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por status">
+            {statusFilters.map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => setActiveStatus(value)}
+                aria-pressed={activeStatus === value}
+                className={chipClass(activeStatus === value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-      {/* Issuer filter */}
-      <div className="flex flex-wrap gap-2 mt-2" role="group" aria-label="Filtrar por emissor">
-        <button
-          onClick={() => setActiveIssuer('all')}
-          aria-pressed={activeIssuer === 'all'}
-          className={chipClass(activeIssuer === 'all')}
-        >
-          Todos emissores
-        </button>
-        {issuers.map(({ issuer, short }) => (
-          <button
-            key={issuer}
-            onClick={() => setActiveIssuer(issuer)}
-            aria-pressed={activeIssuer === issuer}
-            className={chipClass(activeIssuer === issuer)}
-          >
-            {short}
-          </button>
-        ))}
+        {/* Issuer filter */}
+        <div className="px-4 py-3">
+          <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">
+            Emissor
+          </p>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por emissor">
+            <button
+              onClick={() => setActiveIssuer('all')}
+              aria-pressed={activeIssuer === 'all'}
+              className={chipClass(activeIssuer === 'all')}
+            >
+              Todos
+            </button>
+            {issuers.map(({ issuer, short }) => (
+              <button
+                key={issuer}
+                onClick={() => setActiveIssuer(issuer)}
+                aria-pressed={activeIssuer === issuer}
+                className={chipClass(activeIssuer === issuer)}
+              >
+                {short}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Empty state */}
