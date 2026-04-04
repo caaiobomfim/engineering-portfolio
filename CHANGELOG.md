@@ -4,6 +4,16 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.3.5] - 2026-04-04
+
+### 🎨 UI
+- Introduzida cor de accent `blue-600` em todo o site: botão "Ver projetos" (home), links "Ver todos →", link "Ver projeto →" nas cards (aparece no hover), e chip de status ativo nas certificações
+- Nav link da página atual destacado em azul para indicar página ativa
+- Borda esquerda colorida nos cards de stats de certificações (verde = Ativas, âmbar = Planejadas, azul = Concluídas, cinza = Expiradas)
+- Borda de foco da barra de busca alterada para azul
+
+---
+
 ## [v1.3.4] - 2026-04-04
 
 ### 🎨 UI

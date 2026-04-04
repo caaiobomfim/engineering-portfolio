@@ -22,7 +22,7 @@ export default async function HomePage() {
         <div className="mt-6">
           <Link
             href="/projects"
-            className="inline-block rounded-md bg-gray-900 dark:bg-gray-100 px-4 py-2 text-sm font-medium text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors"
+            className="inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 transition-colors"
           >
             Ver projetos
           </Link>
@@ -41,7 +41,7 @@ export default async function HomePage() {
           </div>
           {all.length > featured.length && (
             <div className="mt-8">
-              <Link href="/projects" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+              <Link href="/projects" className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
                 Ver todos os projetos →
               </Link>
             </div>
@@ -61,7 +61,7 @@ export default async function HomePage() {
           </div>
           {allCerts.length > featuredCerts.length && (
             <div className="mt-8">
-              <Link href="/certifications" className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+              <Link href="/certifications" className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
                 Ver todas as certificações →
               </Link>
             </div>

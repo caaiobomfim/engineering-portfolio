@@ -16,11 +16,11 @@ const statusFilters: { value: StatusFilter; label: string }[] = [
 ]
 
 const statsDef = [
-  { key: 'total' as const, label: 'Total', color: 'text-gray-900 dark:text-gray-100' },
-  { key: 'active' as const, label: 'Ativas', color: 'text-green-600 dark:text-green-400' },
-  { key: 'planned' as const, label: 'Planejadas', color: 'text-amber-600 dark:text-amber-400' },
-  { key: 'completed' as const, label: 'Concluídas', color: 'text-blue-600 dark:text-blue-400' },
-  { key: 'expired' as const, label: 'Expiradas', color: 'text-gray-400 dark:text-gray-500' },
+  { key: 'total' as const, label: 'Total', color: 'text-gray-900 dark:text-gray-100', border: 'border-l-gray-400 dark:border-l-gray-500' },
+  { key: 'active' as const, label: 'Ativas', color: 'text-green-600 dark:text-green-400', border: 'border-l-green-500 dark:border-l-green-400' },
+  { key: 'planned' as const, label: 'Planejadas', color: 'text-amber-600 dark:text-amber-400', border: 'border-l-amber-500 dark:border-l-amber-400' },
+  { key: 'completed' as const, label: 'Concluídas', color: 'text-blue-600 dark:text-blue-400', border: 'border-l-blue-500 dark:border-l-blue-400' },
+  { key: 'expired' as const, label: 'Expiradas', color: 'text-gray-400 dark:text-gray-500', border: 'border-l-gray-300 dark:border-l-gray-600' },
 ]
 
 interface Props {
@@ -62,7 +62,7 @@ export function CertificationsSection({ certifications }: Props) {
   const chipClass = (active: boolean) =>
     `px-3 py-1 rounded-full text-sm font-medium transition-colors ${
       active
-        ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
+        ? 'bg-blue-600 text-white dark:bg-blue-500 dark:text-white'
         : 'bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
     }`
 
@@ -70,10 +70,10 @@ export function CertificationsSection({ certifications }: Props) {
     <div>
       {/* Stats panel */}
       <div className="mt-6 grid grid-cols-2 sm:grid-cols-5 gap-3">
-        {statsDef.map(({ key, label, color }) => (
+        {statsDef.map(({ key, label, color, border }) => (
           <div
             key={key}
-            className="border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 text-center bg-white dark:bg-gray-900"
+            className={`border border-gray-200 dark:border-gray-700 border-l-4 ${border} rounded-lg px-4 py-3 text-center bg-white dark:bg-gray-900`}
           >
             <p className={`text-2xl font-bold ${color}`}>{stats[key]}</p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{label}</p>
