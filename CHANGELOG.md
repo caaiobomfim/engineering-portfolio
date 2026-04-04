@@ -4,6 +4,20 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.3.1] - 2026-04-04
+
+### ✨ Added
+- Certificação planejada **AWS Certified CloudOps Engineer – Associate** com badge oficial (substitui AWS SysOps Administrator, que foi descontinuada)
+- Certificação planejada **AWS Certified AI Practitioner** com badge oficial
+- Badge adicionado à certificação planejada **CKAD**
+- Certificação planejada **Datadog Fundamentals** com badge oficial; novo emissor "Datadog" adicionado aos chips de filtro
+
+### 🗑️ Removed
+- Certificação planejada **AWS Certified SysOps Administrator – Associate** (certificação descontinuada pela AWS)
+- Certificação planejada **AWS Certified DevOps Engineer – Professional** (descartada)
+
+---
+
 ## [v1.3.0] - 2026-04-04
 
 ### ✨ Added
