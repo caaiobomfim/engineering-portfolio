@@ -4,6 +4,31 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.3.5] - 2026-04-04
+
+### 🎨 UI
+- Introduzida cor de accent `blue-600` em todo o site: botão "Ver projetos" (home), links "Ver todos →", link "Ver projeto →" nas cards (aparece no hover), e chip de status ativo nas certificações
+- Nav link da página atual destacado em azul para indicar página ativa
+- Borda esquerda colorida nos cards de stats de certificações (verde = Ativas, âmbar = Planejadas, azul = Concluídas, cinza = Expiradas)
+- Borda de foco da barra de busca alterada para azul
+
+---
+
+## [v1.3.4] - 2026-04-04
+
+### 🎨 UI
+- Filtro de emissor na página de certificações substituído por um `<select>` combobox, eliminando a linha de chips e simplificando a UI do painel de filtros
+
+---
+
+## [v1.3.3] - 2026-04-04
+
+### 🎨 UI
+- Filtros da página de certificações reorganizados em um painel unificado com fundo sutil e divisores entre seções (Opção B); cada grupo agora tem um label "STATUS" e "EMISSOR" para eliminar ambiguidade visual entre os dois conjuntos de chips
+- Label "Todos emissores" encurtado para "Todos" dentro do painel para melhor aproveitamento de espaço
+
+---
+
 ## [v1.3.2] - 2026-04-04
 
 ### ✨ Added

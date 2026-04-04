@@ -55,7 +55,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </div>
 
         {/* "Ver projeto" indicator */}
-        <span className="absolute bottom-5 right-5 text-xs text-gray-300 dark:text-gray-600 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors duration-200 flex items-center gap-1 font-medium">
+        <span className="absolute bottom-5 right-5 text-xs text-gray-300 dark:text-gray-600 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 flex items-center gap-1 font-medium">
           Ver projeto
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
             <path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
