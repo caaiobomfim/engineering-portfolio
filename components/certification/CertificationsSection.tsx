@@ -30,7 +30,6 @@ interface Props {
 export function CertificationsSection({ certifications }: Props) {
   const [activeStatus, setActiveStatus] = useState<StatusFilter>('all')
   const [activeIssuer, setActiveIssuer] = useState<string>('all')
-  const [search, setSearch] = useState('')
 
   // Stats always computed from the full list
   const stats = useMemo(() => {
@@ -53,12 +52,10 @@ export function CertificationsSection({ certifications }: Props) {
   }, [certifications])
 
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
     return certifications
       .filter((c) => activeStatus === 'all' || c.status === activeStatus)
       .filter((c) => activeIssuer === 'all' || c.issuer === activeIssuer)
-      .filter((c) => !q || c.title.toLowerCase().includes(q))
-  }, [certifications, activeStatus, activeIssuer, search])
+  }, [certifications, activeStatus, activeIssuer])
 
   const groups = groupByIssuer(filtered)
 
@@ -86,17 +83,6 @@ export function CertificationsSection({ certifications }: Props) {
 
       {/* Filters panel */}
       <div className="mt-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800/50 divide-y divide-gray-200 dark:divide-gray-700">
-        {/* Search row */}
-        <div className="px-4 py-3">
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar certificação..."
-            className="w-full sm:max-w-xs px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600"
-          />
-        </div>
-
         {/* Status filter */}
         <div className="px-4 py-3">
           <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2.5">
