@@ -4,6 +4,13 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.3.6] - 2026-04-04
+
+### 🎨 UI
+- Listra colorida no topo de cada card de certificação identificando o emissor: AWS (#FF9900), CNCF (#0086FF), HashiCorp (#7B42BC), Datadog (#632CA6), Itaú Unibanco (laranja) e Certiprof (#003087)
+
+---
+
 ## [v1.3.5] - 2026-04-04
 
 ### 🎨 UI
