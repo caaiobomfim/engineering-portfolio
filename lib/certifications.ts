@@ -51,17 +51,19 @@ export const certifications: Certification[] = [
   },
   // AWS – planned
   {
-    id: 'aws-sysops-administrator-associate',
-    title: 'AWS Certified SysOps Administrator – Associate',
+    id: 'aws-cloudops-engineer-associate',
+    title: 'AWS Certified CloudOps Engineer – Associate',
     issuer: 'Amazon Web Services Training and Certification',
     issuerShort: 'AWS',
+    badgeUrl: '/images/certifications/aws-cloudops-engineer-associate.png',
     status: 'planned',
   },
   {
-    id: 'aws-devops-engineer-professional',
-    title: 'AWS Certified DevOps Engineer – Professional',
+    id: 'aws-ai-practitioner',
+    title: 'AWS Certified AI Practitioner',
     issuer: 'Amazon Web Services Training and Certification',
     issuerShort: 'AWS',
+    badgeUrl: '/images/certifications/aws-ai-practitioner.png',
     status: 'planned',
   },
   // CNCF – planned
@@ -70,7 +72,16 @@ export const certifications: Certification[] = [
     title: 'Certified Kubernetes Application Developer – CKAD',
     issuer: 'Cloud Native Computing Foundation',
     issuerShort: 'CNCF',
+    badgeUrl: '/images/certifications/ckad.png',
     status: 'planned',
+  },
+  // Datadog – planned
+  {
+    id: 'datadog-fundamentals',
+    title: 'Datadog Fundamentals',
+    issuer: 'Datadog',
+    status: 'planned',
+    badgeUrl: '/images/certifications/certified-datadog-fundamentals.png',
   },
   // Itaú – completed
   {
