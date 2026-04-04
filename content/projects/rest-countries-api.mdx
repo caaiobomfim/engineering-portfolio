@@ -1,17 +1,19 @@
 ---
 title: "REST Countries API"
 slug: "rest-countries-api"
-summary: "API intermediária em Java/Spring Boot para consumo da REST Countries API pública, com foco em testes de integração, resiliência e evolução incremental por releases."
+summary: "API intermediária em Java 21/Spring Boot 3 para consumo da REST Countries API pública, com foco em práticas de SRE e DevOps — observabilidade, resiliência, infraestrutura como código e evolução incremental por releases."
 stack:
   - Java
   - Spring Boot
+  - OpenFeign
   - WireMock
-  - Testcontainers
   - Docker
+  - Lombok
 tags:
   - backend
   - testes
   - arquitetura
+  - sre
 status: "Em andamento"
 featured: true
 order: 2
@@ -24,9 +26,9 @@ date: "2024-12-01"
 
 ## Contexto
 
-O Journey Lab é uma iniciativa pessoal de evolução técnica onde cada projeto simula cenários reais de engenharia de software. O **REST Countries API** foi construído para ir além do CRUD básico: o objetivo era aplicar boas práticas de arquitetura, testes e resiliência em um contexto de integração com serviço externo.
+O **Journey Lab** é uma iniciativa pessoal de evolução técnica com foco na migração para áreas de **SRE e Cloud/DevOps**. O **REST Countries API** é o primeiro projeto dessa jornada, simulando um cenário real de integração com serviço externo para aplicar boas práticas de observabilidade, resiliência, infraestrutura como código, automação e escalabilidade.
 
-O projeto foi desenvolvido de forma incremental, seguindo um modelo de evolução por releases — semelhante ao fluxo de times de engenharia maduros — com cada versão adicionando uma camada de qualidade ao sistema.
+O projeto foi desenvolvido de forma incremental, seguindo um modelo de evolução por releases — semelhante ao fluxo de times de engenharia maduros — com cada versão adicionando uma camada de qualidade e maturidade operacional ao sistema.
 
 ## Problema
 
@@ -54,38 +56,60 @@ Construção de uma API intermediária que consome a [REST Countries API](https:
 Cliente HTTP
      │
      ▼
-Controller (REST)
-     │  validação de entrada, mapeamento de rotas
+CountryController (REST)
+     │  GET /countries/{name}
      ▼
-Service
-     │  regras de negócio, orquestração
+CountryServiceImpl (implementa CountryServicePort)
+     │  aplica regras e transforma a resposta
      ▼
-Feign Client
-     │  comunicação tipada com a API externa
+CountryClient (OpenFeign)
+     │  GET /name/{name}
      ▼
-REST Countries API (externa)
+REST Countries API (externa) ou WireMock (local/testes)
 ```
 
-O tratamento de exceções é centralizado: erros do Feign (timeout, 4xx, 5xx) são capturados em um `ErrorDecoder` e convertidos para exceções de domínio antes de chegar ao Service. Isso isola o restante da aplicação de detalhes do protocolo HTTP externo.
+A separação via interface `CountryServicePort` isola o contrato da implementação, facilitando testes e substituição de dependências. O `CountryClient` via OpenFeign é a única fronteira com o mundo externo — em desenvolvimento e CI, o WireMock assume esse papel via Docker Compose.
 
 ![Arquitetura do Journey Lab REST Countries](/images/projects/rest-countries-api/cover.svg)
 
+## API
+
+| Método | Endpoint | Resposta | Descrição |
+|---|---|---|---|
+| `GET` | `/countries/{name}` | `200` | Retorna informações do país pelo nome |
+
+**Resposta de sucesso (`200 OK`):**
+```json
+{
+  "name": "Brazil",
+  "capital": "Brasilia",
+  "region": "Americas",
+  "population": 212559409,
+  "flagUrl": "https://flagcdn.com/w320/br.png"
+}
+```
+
+A URL da API externa é configurável via variável de ambiente `COUNTRY_API_URL`, permitindo alternar entre o WireMock local e a API real (`https://restcountries.com/v3.1`) sem alterar o código.
+
 ## Stack Utilizada
 
-- **Java 17 + Spring Boot** — base da aplicação; Spring Boot para configuração e exposição dos endpoints
-- **Spring Cloud OpenFeign** — cliente HTTP declarativo para integração com a REST Countries API
-- **JUnit 5** — testes unitários das camadas de Service e Controller
-- **WireMock** — simulação da API externa nos testes de integração; permite testar cenários de erro sem depender do serviço real
-- **Testcontainers** — ambiente isolado e reprodutível para testes de integração; elimina o problema de "funciona na minha máquina"
-- **Docker + Compose** — containerização da aplicação e dependências
+| Camada | Tecnologia |
+|---|---|
+| Backend | Java 21, Spring Boot 3.4.8, Spring Cloud 2024.0.2 |
+| Integração | Spring Cloud OpenFeign (cliente HTTP declarativo) |
+| Infraestrutura local | Docker + Docker Compose, WireMock (container standalone) |
+| Utilitários | Lombok (redução de boilerplate), Spring Boot Actuator (health/métricas) |
+| Testes | JUnit 5, Spring Boot Test |
 
 ## Decisões Técnicas
 
-**WireMock em vez de mocks in-memory:** a escolha foi deliberada. Mocks in-memory testam o comportamento do código, mas não testam a serialização/deserialização HTTP, headers, status codes e outros detalhes de protocolo. WireMock simula um servidor HTTP real, tornando os testes de integração muito mais próximos do comportamento em produção.
+**WireMock via Docker Compose (não embarcado nos testes):** no v0.1.0, o WireMock roda como um container standalone gerenciado pelo Docker Compose, na porta `10104`. A URL é injetada na aplicação via variável de ambiente `COUNTRY_API_URL=http://wiremock:8080/v3.1`. Isso permite simular a API externa localmente sem alterar código — basta trocar a variável para apontar para a API real. A integração com Testcontainers é planejada para releases futuras.
 
-**Testcontainers para isolamento:** garantir que os testes rodam da mesma forma em qualquer ambiente (local, CI, máquina de outro dev) é crítico para um projeto que cresce. Testcontainers provisiona a infraestrutura necessária em containers Docker a cada execução de teste.
+**Interface `CountryServicePort`:** o contrato do serviço é definido em uma interface, desacoplando Controller de implementação. Isso facilita testes unitários com mocks e permite evoluir a implementação sem impactar quem depende do contrato.
 
-**Evolução por releases:** em vez de tentar construir o sistema "completo" de uma vez, cada release adiciona uma camada de qualidade. Isso simula como times reais trabalham e permite aprender de forma mais estruturada.
+**Java Records para DTOs:** `CountryResponse` e os DTOs aninhados de `CountryApiResponse` (incluindo `CountryName` e `CountryFlags`) são Java records — imutáveis por padrão, com `equals`, `hashCode` e `toString` gerados automaticamente.
+
+**Evolução por releases com intenção clara:** em vez de tentar construir o sistema "completo" de uma vez, cada release adiciona uma camada de maturidade com objetivo específico. Isso simula como times de engenharia maduros trabalham e permite aprender de forma estruturada.
 
 ## Desafios
 
@@ -103,9 +127,17 @@ O tratamento de exceções é centralizado: erros do Feign (timeout, 4xx, 5xx) s
 
 **Observabilidade deve ser planejada desde o início.** Adicionar logs estruturados retroativamente é muito mais trabalhoso do que incluí-los na implementação inicial. Esse foi o principal aprendizado que vai guiar as próximas releases do projeto.
 
-## Próximos Passos
+## Roadmap de Releases
 
-- Implementar resiliência com **Resilience4j** (Retry, Circuit Breaker, Timeout configurável por rota)
-- Adicionar **observabilidade completa**: logs estruturados (JSON), métricas via Micrometer, tracing com OpenTelemetry
-- Criar dashboard de monitoramento (Prometheus + Grafana)
-- Deploy em cloud (AWS ECS ou similar) com pipeline de CI/CD
+| Release | Objetivo | Status |
+|---|---|---|
+| **0.1** | API funcional com consumo da REST Countries | ✅ Concluída |
+| **0.2** | Cache com Caffeine | ⏳ Planejada |
+| **0.3** | Observabilidade com Micrometer + Prometheus | ⏳ Planejada |
+| **0.4** | Testes de integração com Testcontainers | ⏳ Planejada |
+| **0.5** | Dockerização completa | ⏳ Planejada |
+| **0.6** | Deploy com Terraform em AWS ECS | ⏳ Planejada |
+| **0.7** | API Gateway + autenticação básica | ⏳ Planejada |
+| **0.8** | Alertas e dashboards com Grafana/Datadog | ⏳ Planejada |
+| **0.9** | Resiliência: Retry, Timeout, Circuit Breaker | ⏳ Planejada |
+| **1.0** | Publicação no GitHub + LinkedIn | ⏳ Planejada |
