@@ -4,6 +4,17 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.4.0] - 2026-04-04
+
+### ✨ Added
+- Nova página `/reading` com livros e artigos técnicos organizados por status: Concluídos, Lendo e Quero ler
+- Modelo de dados `ReadingItem` (`lib/reading.ts`) com campos `type`, `status`, `category`, `description`, `link`, `year`
+- Cards com ícone por tipo (livro → âmbar, artigo → azul), chips de categoria, badge de status e link externo clicável
+- 4 itens iniciais: Clean Architecture, Designing Data-Intensive Applications, AWS Well-Architected Framework, SRE Google
+- Link "Leitura" adicionado à navegação principal
+
+---
+
 ## [v1.3.6] - 2026-04-04
 
 ### 🎨 UI
