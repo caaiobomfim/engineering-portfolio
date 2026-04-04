@@ -14,12 +14,14 @@ function lookupIcon(slug: string) {
 
 const statusStyles: Record<CertificationStatus, string> = {
   active: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  planned: 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
   completed: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   expired: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-500',
 }
 
 const statusLabels: Record<CertificationStatus, string> = {
   active: 'Ativa',
+  planned: 'Planejada',
   completed: 'Concluída',
   expired: 'Expirada',
 }
@@ -48,6 +50,9 @@ export function CertificationCard({ certification }: CertificationCardProps) {
   if (status === 'active' && expirationDate) {
     dateLabel = 'Expires'
     dateValue = expirationDate
+  } else if (status === 'planned') {
+    dateLabel = null
+    dateValue = null
   } else if (status === 'completed' && issuedDate) {
     dateLabel = 'Issued'
     dateValue = issuedDate
@@ -61,10 +66,14 @@ export function CertificationCard({ certification }: CertificationCardProps) {
     ? { href: credentialUrl, target: '_blank', rel: 'noopener noreferrer' }
     : {}
 
+  const plannedStyles = status === 'planned'
+    ? 'border-dashed opacity-75'
+    : 'hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-sm'
+
   return (
     <Wrapper
       {...(wrapperProps as object)}
-      className="border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900 p-5 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-sm transition-all flex items-center gap-5"
+      className={`border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900 p-5 transition-all flex items-center gap-5 ${plannedStyles}`}
     >
       {/* Badge */}
       <div className="flex items-center justify-center w-24 h-24 shrink-0 overflow-hidden">
