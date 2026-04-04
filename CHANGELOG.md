@@ -4,6 +4,13 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.3.2] - 2026-04-04
+
+### ✨ Added
+- Certificação planejada **HashiCorp Certified: Terraform Associate** com badge oficial; novo emissor "HashiCorp" adicionado aos chips de filtro
+
+---
+
 ## [v1.3.1] - 2026-04-04
 
 ### ✨ Added

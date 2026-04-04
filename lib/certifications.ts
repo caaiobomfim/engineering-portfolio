@@ -83,6 +83,14 @@ export const certifications: Certification[] = [
     status: 'planned',
     badgeUrl: '/images/certifications/certified-datadog-fundamentals.png',
   },
+  // HashiCorp – planned
+  {
+    id: 'hashicorp-terraform-associate',
+    title: 'HashiCorp Certified: Terraform Associate',
+    issuer: 'HashiCorp',
+    status: 'planned',
+    badgeUrl: '/images/certifications/terraform-associate.png',
+  },
   // Itaú – completed
   {
     id: 'itau-change-management',
