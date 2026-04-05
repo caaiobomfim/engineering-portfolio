@@ -4,6 +4,23 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.5.0] - 2026-04-05
+
+### ✨ Added
+- Nova seção `/studies` — base de conhecimento com cenários reais de engenharia de software
+- Rota de listagem `/studies` com busca por texto (título + descrição + tags), filtro por tags e contagem de resultados
+- Rota de detalhe `/studies/[slug]` com renderização MDX, badge de nível, tags coloridas e tempo de leitura estimado
+- `lib/study-utils.ts` — tipos (`Study`, `StudyLevel`, `StudyWithContent`), `extractAllStudyTags` e `filterStudies` (client-safe, sem `fs`)
+- `lib/studies.ts` — loader server-only com `getAllStudies`, `getStudyBySlug` e estimativa de tempo de leitura (palavras / 200)
+- `components/study/StudyCard.tsx` — card com ícone de livro (violet), badge de nível (verde/âmbar/rose), tags (até 3 + overflow), tempo de leitura e indicador "Ler estudo"
+- `components/study/StudiesSection.tsx` — client component com SearchInput, TagFilter, URL sync e estado vazio
+- Link "Estudos" adicionado à navegação principal (entre Projetos e Certificações)
+- 2 estudos de exemplo em `content/studies/`:
+  - **Fanout com SNS + SQS na AWS** — padrão fanout, fluxo SNS → múltiplas filas SQS, permissões IAM, DLQ
+  - **Cache com Redis em Microsserviços** — Cache-Aside, TTL, invalidação com `@CacheEvict`, thundering herd, chave multi-tenant
+
+---
+
 ## [v1.4.0] - 2026-04-04
 
 ### ✨ Added

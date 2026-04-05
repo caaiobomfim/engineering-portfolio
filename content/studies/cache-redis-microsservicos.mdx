@@ -1,0 +1,161 @@
+---
+title: Cache com Redis em Microsserviços
+description: Estratégias de cache distribuído para resolver problemas de performance em microsserviços, incluindo Cache-Aside, TTL e invalidação de cache.
+date: "2024-05-20"
+tags: [Redis, Cache, Performance, Microsserviços, Spring Boot, Java]
+level: intermediário
+featured: true
+---
+
+## 🧠 Contexto
+
+Um endpoint de consulta de apólices (`GET /policies/{id}`) estava com latência média de **1.2 segundos** em produção. O profiling revelou que a maior parte do tempo era gasta em consultas ao banco de dados PostgreSQL: a apólice envolvia joins em 6 tabelas (coberturas, beneficiários, cláusulas, histórico de pagamentos, etc.).
+
+O dado era praticamente imutável — uma apólice só muda quando o cliente solicita alteração, o que ocorre raramente. Fazer um join pesado a cada requisição para servir dados que não mudaram não fazia sentido.
+
+## 🎯 Objetivo
+
+Reduzir a latência do endpoint de consulta de apólices para abaixo de **100ms**, sem comprometer a consistência dos dados.
+
+## 🏗️ Arquitetura
+
+Adotamos o padrão **Cache-Aside** (também chamado Lazy Loading): a aplicação consulta o cache primeiro; se o dado não estiver lá (cache miss), busca no banco e armazena no cache antes de retornar.
+
+```
+Cliente
+  │
+  ▼
+[API Gateway]
+  │
+  ▼
+[Policy Service]
+  │
+  ├──► Redis ──► HIT ──► retorna dado
+  │       │
+  │      MISS
+  │       │
+  └──► PostgreSQL ──► armazena no Redis ──► retorna dado
+```
+
+**Por que Cache-Aside e não Write-Through?**
+No padrão Write-Through, o cache é atualizado a cada escrita. Como apólices raramente mudam, manter o cache atualizado para dados nunca acessados seria desperdício. Com Cache-Aside, só cacheamos o que é realmente consultado.
+
+## ⚙️ Implementação
+
+**1. Dependência no `pom.xml`:**
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-cache</artifactId>
+</dependency>
+```
+
+**2. Configuração do Redis:**
+
+```yaml
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+      timeout: 2000ms
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000  # 1 hora em ms
+      cache-null-values: false
+```
+
+**3. Habilitar cache na aplicação:**
+
+```java
+@SpringBootApplication
+@EnableCaching
+public class PolicyServiceApplication { ... }
+```
+
+**4. Anotar o método de serviço:**
+
+```java
+@Service
+public class PolicyService {
+
+    @Cacheable(value = "policies", key = "#policyId", unless = "#result == null")
+    public PolicyDto findById(String policyId) {
+        return policyRepository.findByIdWithDetails(policyId)
+            .map(policyMapper::toDto)
+            .orElse(null);
+    }
+
+    @CacheEvict(value = "policies", key = "#policy.id")
+    public PolicyDto update(Policy policy) {
+        // salva no banco e invalida o cache
+        return policyRepository.save(policy);
+    }
+}
+```
+
+**5. Serialização com Jackson:**
+
+```java
+@Configuration
+public class CacheConfig {
+
+    @Bean
+    public RedisCacheConfiguration redisCacheConfiguration() {
+        return RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofHours(1))
+            .serializeValuesWith(
+                RedisSerializationContext.SerializationPair.fromSerializer(
+                    new GenericJackson2JsonRedisSerializer()
+                )
+            );
+    }
+}
+```
+
+## 💡 Decisões importantes
+
+**TTL de 1 hora:**
+Como apólices raramente mudam, um TTL longo reduz cache misses. O risco de servir dados desatualizados é aceitável porque toda alteração explícita invalida o cache via `@CacheEvict`.
+
+**`cache-null-values: false`:**
+Não cacheamos `null` para evitar guardar no cache o fato de que uma apólice não existe. Isso seria problemático se a apólice fosse criada depois.
+
+**Serialização JSON vs Java Serialization:**
+Optamos por JSON (Jackson) em vez da serialização padrão do Java. Motivos: portabilidade entre versões do código, legibilidade para debugging via Redis CLI, e evitar `InvalidClassException` após deploys.
+
+**Timeout no cliente Redis:**
+Configuramos `timeout: 2000ms`. Se o Redis estiver indisponível, a aplicação lança exceção após 2s e vai direto ao banco — degradação graciosa em vez de travar indefinidamente.
+
+## ⚠️ Problemas encontrados
+
+**Cache poisoning por dados incompletos:**
+Em um bug inicial, o método era chamado durante a inicialização de outro bean com dados parciais, cacheando um DTO incompleto. O dado correto só chegava depois. Solução: garantir que o método cacheado só é chamado após todos os beans estarem inicializados, e adicionar validação no DTO antes de cachear.
+
+**Thundering herd após restart:**
+Quando o serviço reiniciava, todos os caches estavam frios. As primeiras centenas de requisições iam direto ao banco simultâneamente, causando pico de carga. Solução: warm-up do cache na inicialização para as apólices mais acessadas, usando dados de um relatório de acesso.
+
+**Chave de cache por tenant:**
+O sistema era multi-tenant. Sem incluir o tenant na chave, apólice `123` do tenant A retornava o mesmo cache que apólice `123` do tenant B. Solução: incluir o tenant na chave: `key = "#tenantId + ':' + #policyId"`.
+
+## 🚀 Melhorias futuras
+
+- **Cache em duas camadas (L1 + L2):** Adicionar cache local em memória (Caffeine) como L1 e Redis como L2. Requisições repetidas no mesmo pod ficam sub-milissegundo sem sair da JVM.
+- **Cache warming inteligente:** Em vez de warm-up fixo na inicialização, usar dados de acesso em tempo real para priorizar o que cachear.
+- **Observabilidade:** Adicionar métricas de hit rate, miss rate e latência do Redis via Micrometer + Grafana para monitorar a efetividade do cache.
+- **Probabilistic Early Expiration:** Evitar que múltiplos processos recalculem o cache ao mesmo tempo quando o TTL está prestes a expirar.
+
+## 📚 Aprendizados
+
+- Cache-Aside é a estratégia mais segura para dados com leitura frequente e escrita rara
+- TTL e invalidação explícita (`@CacheEvict`) devem ser usados juntos — nunca confiar só no TTL para consistência
+- Sempre incluir todos os discriminadores na chave do cache (tenant, versão, contexto)
+- Serialização JSON facilita debugging e evita problemas de compatibilidade entre versões
+- Thundering herd é um problema real que precisa ser planejado antes do go-live
+- Redis com timeout configurado é muito melhor que Redis sem timeout — falha rápida é preferível a falha lenta
