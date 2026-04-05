@@ -4,6 +4,14 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.5.2] - 2026-04-05
+
+### 🎨 UI
+- Menu hamburguer no header para mobile (abaixo de `sm:`): botão ☰/✕, dropdown com links em coluna, link ativo com fundo azul sutil, fecha automaticamente ao navegar
+- Desktop mantém comportamento anterior (links em linha)
+
+---
+
 ## [v1.5.0] - 2026-04-05
 
 ### ✨ Added
