@@ -4,6 +4,21 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.5.2] - 2026-04-05
+
+### 🎨 UI
+- Menu hamburguer no header para mobile (abaixo de `sm:`): botão ☰/✕, dropdown com links em coluna, link ativo com fundo azul sutil, fecha automaticamente ao navegar
+- Desktop mantém comportamento anterior (links em linha)
+
+---
+
+## [v1.5.1] - 2026-04-05
+
+### 🐛 Fixed
+- Cards de estudos: "Ler estudo →" e tempo de leitura separados em linha própria (`justify-between`) — eliminada sobreposição causada pelo `position: absolute`
+
+---
+
 ## [v1.5.0] - 2026-04-05
 
 ### ✨ Added
