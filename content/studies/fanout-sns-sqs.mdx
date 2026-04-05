@@ -1,0 +1,157 @@
+---
+title: Fanout com SNS + SQS na AWS
+description: Como implementar o padrão fanout para distribuir eventos de um único publicador para múltiplos consumidores independentes usando SNS e SQS.
+date: "2024-03-15"
+tags: [AWS, SNS, SQS, Fanout, Mensageria, Arquitetura]
+level: intermediário
+featured: true
+---
+
+## 🧠 Contexto
+
+Em um sistema de e-commerce, toda vez que um pedido era confirmado, três serviços diferentes precisavam ser notificados: o serviço de **estoque** (para dar baixa nos itens), o serviço de **notificações** (para enviar e-mail ao cliente) e o serviço de **analytics** (para registrar a conversão).
+
+A abordagem inicial era fazer chamadas HTTP síncronas sequencialmente ao confirmar o pedido. O problema ficou evidente quando o serviço de analytics ficou indisponível por alguns minutos: a confirmação do pedido falhava para o cliente, mesmo que estoque e notificações funcionassem perfeitamente.
+
+## 🎯 Objetivo
+
+Desacoplar o serviço de pedidos dos consumidores downstream, garantindo que:
+
+- A falha de um consumidor não impacte os demais
+- O serviço de pedidos não precise conhecer quem consome o evento
+- Novos consumidores possam ser adicionados sem alterar o publicador
+- Mensagens não sejam perdidas em caso de falha temporária
+
+## 🏗️ Arquitetura
+
+O padrão **Fanout** resolve exatamente esse problema: um único tópico SNS recebe a mensagem e a distribui para múltiplas filas SQS, cada uma pertencendo a um consumidor diferente.
+
+```
+[Serviço de Pedidos]
+        │
+        ▼
+  [SNS Topic: orders]
+   ┌────┴────┬─────────┐
+   ▼         ▼         ▼
+[SQS:     [SQS:     [SQS:
+ stock]   notify]  analytics]
+   │         │         │
+   ▼         ▼         ▼
+[Serviço  [Serviço  [Serviço de
+ Estoque] Notif.]   Analytics]
+```
+
+**Fluxo detalhado:**
+1. Pedido confirmado → publicação no tópico SNS `orders-confirmed`
+2. SNS entrega a mensagem para todas as filas SQS inscritas simultaneamente
+3. Cada serviço consome sua própria fila de forma independente
+4. Em caso de falha, a mensagem permanece na fila para nova tentativa (retry)
+5. Após N tentativas, a mensagem vai para uma Dead Letter Queue (DLQ)
+
+## ⚙️ Implementação
+
+**1. Criar o tópico SNS:**
+
+```bash
+aws sns create-topic --name orders-confirmed
+```
+
+**2. Criar as filas SQS (incluindo DLQs):**
+
+```bash
+# DLQ para o serviço de estoque
+aws sqs create-queue --queue-name orders-stock-dlq
+
+# Fila principal com referência à DLQ
+aws sqs create-queue --queue-name orders-stock \
+  --attributes '{"RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:...:orders-stock-dlq\",\"maxReceiveCount\":\"3\"}"}'
+```
+
+**3. Criar subscription SNS → SQS:**
+
+```bash
+aws sns subscribe \
+  --topic-arn arn:aws:sns:...:orders-confirmed \
+  --protocol sqs \
+  --notification-endpoint arn:aws:sqs:...:orders-stock
+```
+
+**4. Publicar um evento no SNS (Java/Spring Boot):**
+
+```java
+@Service
+public class OrderEventPublisher {
+
+    private final SnsClient snsClient;
+
+    public void publishOrderConfirmed(Order order) {
+        PublishRequest request = PublishRequest.builder()
+            .topicArn("arn:aws:sns:us-east-1:123456789:orders-confirmed")
+            .message(toJson(order))
+            .messageAttributes(Map.of(
+                "eventType", MessageAttributeValue.builder()
+                    .dataType("String")
+                    .stringValue("ORDER_CONFIRMED")
+                    .build()
+            ))
+            .build();
+
+        snsClient.publish(request);
+    }
+}
+```
+
+**5. Consumir a fila SQS:**
+
+```java
+@SqsListener("orders-stock")
+public void handleOrderConfirmed(String message) {
+    Order order = fromJson(message, Order.class);
+    stockService.decreaseStock(order.getItems());
+}
+```
+
+## 💡 Decisões importantes
+
+**Por que SNS + SQS e não só SNS?**
+SNS entrega diretamente para endpoints HTTP/Lambda, mas sem garantia de retenção. O SQS adiciona persistência: se o consumidor estiver fora, a mensagem aguarda na fila (até 14 dias por padrão).
+
+**Por que não usar apenas SQS com múltiplos consumidores?**
+Uma fila SQS com múltiplos consumidores distribui as mensagens entre eles (modelo competing consumers). Para fanout real, cada consumidor precisa da sua própria fila — o SNS faz essa distribuição automaticamente.
+
+**Dead Letter Queue (DLQ):**
+Configurar DLQ é essencial. Sem ela, mensagens que falham repetidamente são simplesmente descartadas. Com DLQ, é possível investigar e reprocessar.
+
+## ⚠️ Problemas encontrados
+
+**Permissão da fila SQS para receber do SNS:**
+O erro mais comum foi `Access Denied` ao tentar entregar mensagens. É necessário adicionar uma policy na fila SQS permitindo que o SNS publique nela:
+
+```json
+{
+  "Effect": "Allow",
+  "Principal": { "Service": "sns.amazonaws.com" },
+  "Action": "sqs:SendMessage",
+  "Resource": "arn:aws:sqs:...:orders-stock",
+  "Condition": {
+    "ArnEquals": { "aws:SourceArn": "arn:aws:sns:...:orders-confirmed" }
+  }
+}
+```
+
+**Formato da mensagem:**
+O SNS envelopa a mensagem antes de entregar ao SQS. O corpo recebido pelo consumidor não é o JSON original, mas sim um JSON do SNS com o campo `Message` contendo o payload real. É necessário fazer double deserialization ou configurar `RawMessageDelivery = true` na subscription.
+
+## 🚀 Melhorias futuras
+
+- **Message filtering:** O SNS suporta filtros por atributos da mensagem. Em vez de criar uma subscription por consumidor, seria possível usar uma única fila e filtrar pelo atributo `eventType`, reduzindo o número de subscriptions.
+- **FIFO queues:** Para casos onde a ordem das mensagens importa, usar SNS FIFO + SQS FIFO garante ordenação e deduplicação.
+- **Outbox Pattern:** Para garantir que o evento seja publicado somente se a transação do banco de dados for confirmada, evitando inconsistências.
+
+## 📚 Aprendizados
+
+- O padrão fanout é a escolha certa quando um evento precisa ser processado por múltiplos consumidores independentes
+- SNS sozinho não é suficiente para sistemas que precisam de durabilidade — sempre combinar com SQS
+- DLQs não são opcionais em produção; sem elas, falhas silenciosas causam perda de dados
+- Permissões IAM entre serviços AWS são a causa mais comum de bugs na integração SNS → SQS
+- Testar localmente com LocalStack acelera muito o ciclo de desenvolvimento sem gerar custos
