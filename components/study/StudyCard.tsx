@@ -43,36 +43,41 @@ export function StudyCard({ study }: StudyCardProps) {
           </div>
         </div>
 
-        {/* Footer: level + tags + reading time */}
-        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center gap-1.5">
-          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${level.class}`}>
-            {level.label}
-          </span>
-          {study.tags.slice(0, 3).map((tag) => (
-            <span
-              key={tag}
-              className={`text-xs px-2 py-0.5 rounded-full ${getTagColor(tag)}`}
-            >
-              {tag}
+        {/* Footer */}
+        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
+          {/* Row 1: level + tags */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${level.class}`}>
+              {level.label}
             </span>
-          ))}
-          {study.tags.length > 3 && (
-            <span className="text-xs text-gray-400 dark:text-gray-500">
-              +{study.tags.length - 3}
+            {study.tags.slice(0, 3).map((tag) => (
+              <span
+                key={tag}
+                className={`text-xs px-2 py-0.5 rounded-full ${getTagColor(tag)}`}
+              >
+                {tag}
+              </span>
+            ))}
+            {study.tags.length > 3 && (
+              <span className="text-xs text-gray-400 dark:text-gray-500">
+                +{study.tags.length - 3}
+              </span>
+            )}
+          </div>
+          {/* Row 2: reading time + "Ler estudo" */}
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
+              <ClockIcon className="w-3.5 h-3.5" />
+              {study.readingTime} min de leitura
             </span>
-          )}
-          <span className="ml-auto text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
-            <ClockIcon className="w-3.5 h-3.5" />
-            {study.readingTime} min
-          </span>
+            <span className="text-xs text-gray-300 dark:text-gray-600 group-hover:text-violet-500 dark:group-hover:text-violet-400 transition-colors duration-200 flex items-center gap-1 font-medium">
+              Ler estudo
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+                <path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </div>
         </div>
-
-        <span className="absolute bottom-5 right-5 text-xs text-gray-300 dark:text-gray-600 group-hover:text-violet-500 dark:group-hover:text-violet-400 transition-colors duration-200 flex items-center gap-1 font-medium">
-          Ler estudo
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
-            <path d="M2.5 6h7M6.5 3l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </span>
       </article>
     </Link>
   )
