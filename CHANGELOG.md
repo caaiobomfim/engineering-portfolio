@@ -4,6 +4,13 @@ Todas as mudanças importantes deste projeto serão documentadas neste arquivo.
 
 ---
 
+## [v1.5.1] - 2026-04-05
+
+### 🐛 Fixed
+- Cards de estudos: "Ler estudo →" e tempo de leitura separados em linha própria (`justify-between`) — eliminada sobreposição causada pelo `position: absolute`
+
+---
+
 ## [v1.5.0] - 2026-04-05
 
 ### ✨ Added
